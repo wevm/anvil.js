@@ -1,0 +1,24 @@
+# Ignore all dotfiles except the whitelisted ones
+.*
+!.changeset
+!.github
+!.gitignore
+!.vscode
+!.env.example
+
+# Ignore log output
+*.log
+
+# Ignore backup files
+*.bkp
+
+# Ignore tsbuildinfo
+*.tsbuildinfo
+
+# Ignore various outputs
+dist/
+build/
+coverage/
+
+# Ignore dependencies
+node_modules/

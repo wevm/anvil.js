@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "packageManager": "pnpm@8.31.0",
+  "scripts": {
+    "build": "pnpm run --recursive --filter \"./packages/*\" build",
+    "release": "pnpm changeset version && pnpm run --recursive --filter \"./packages/*\" release && pnpm changeset publish",
+    "test": "pnpm run --recursive --filter \"./packages/*\" test --run",
+    "test:coverage": "pnpm run --recursive --filter \"./packages/*\" test:coverage",
+    "clean": "pnpm run --recursive --parallel clean",
+    "typecheck": "pnpm run --recursive --parallel typecheck",
+    "format": "rome format --write . && rome check --apply .",
+    "lint": "rome check ."
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.4.8",
+    "@changesets/cli": "^2.26.1",
+    "rome": "^12.0.0",
+    "typescript": "^5.0.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "anviljs": "workspace:*"
+    }
+  }
+}

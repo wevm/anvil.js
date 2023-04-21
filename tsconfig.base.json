@@ -1,0 +1,38 @@
+{
+  "include": [],
+  "compilerOptions": {
+    // Incremental builds
+    "incremental": true,
+
+    // Type checking
+    "strict": true,
+    "skipLibCheck": true,
+    "useDefineForClassFields": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": true,
+
+    // Modules
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
+
+    // JavaScript support
+    "allowJs": false,
+    "checkJs": false,
+
+    // Interop constraints
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+
+    // Language and environment
+    "lib": ["ESNext"],
+    "target": "ESNext",
+
+    // Sourcemaps
+    "sourceMap": true
+  }
+}

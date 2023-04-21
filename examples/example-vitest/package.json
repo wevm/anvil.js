@@ -1,0 +1,14 @@
+{
+  "name": "example-vitest",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4",
+    "vite": "^4.3.1",
+    "vitest": "^0.30.1"
+  }
+}
