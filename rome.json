@@ -1,11 +1,7 @@
 {
   "files": {
     "ignore": [
-      "dist",
-      "generated",
-      "coverage",
-      "pnpm-lock.yaml",
-      "tsconfig.json",
+      "dist", "generated", "coverage", "pnpm-lock.yaml", "tsconfig.json",
       "tsconfig.*.json"
     ]
   },
