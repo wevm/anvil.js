@@ -4,7 +4,7 @@
   "scripts": {
     "build": "pnpm run --recursive --filter \"./packages/*\" build",
     "release": "pnpm changeset version && pnpm run --recursive --filter \"./packages/*\" release && pnpm changeset publish",
-    "test": "pnpm run --recursive --filter \"./packages/*\" test --run",
+    "test": "pnpm run --recursive --filter \"./packages/*\" test",
     "test:coverage": "pnpm run --recursive --filter \"./packages/*\" test:coverage",
     "clean": "pnpm run --recursive --parallel clean",
     "typecheck": "pnpm run --recursive --parallel typecheck",
