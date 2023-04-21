@@ -1,10 +1,11 @@
 export {
-  type AnvilOptions,
   type Anvil,
+  type AnvilOptions,
+  type StartAnvilOptions,
   startAnvil,
 } from "./anvil.js";
 
 export {
-  type AnvilProxyOptions,
+  type CreateAnvilProxyOptions,
   createAnvilProxy,
 } from "./proxy.js";

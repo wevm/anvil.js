@@ -7,7 +7,7 @@ import {
   shutdownAnvilInstances,
 } from "./instances.js";
 
-export type AnvilProxyOptions = {
+export type CreateAnvilProxyOptions = {
   anvilOptions?: Omit<AnvilOptions, "port">;
   proxyHostname?: string;
   proxyPort?: number;
@@ -31,7 +31,7 @@ export async function createAnvilProxy({
   proxyPort = 8545,
   proxyHostname = "::",
   anvilOptions,
-}: AnvilProxyOptions = {}) {
+}: CreateAnvilProxyOptions = {}) {
   // rome-ignore lint/suspicious/noAsyncPromiseExecutor: this is fine ...
   const server = await new Promise<Server>(async (resolve, reject) => {
     const proxy = createProxyServer({
