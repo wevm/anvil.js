@@ -8,4 +8,5 @@ export {
 export {
   type CreateAnvilProxyOptions,
   createAnvilProxy,
+  getAnvilProxyLogs,
 } from "./proxy.js";

@@ -1,5 +1,6 @@
 import { execa, type ExecaChildProcess } from "execa";
 import { Writable } from "node:stream";
+import { toArgs } from "./utils/toArgs.js";
 
 export type AnvilOptions = {
   /**
@@ -243,17 +244,7 @@ export function startAnvil({
     }
   });
 
-  const args = Object.entries({
-    ...(opts.port ? { "--port": `${opts.port}` } : {}),
-    ...(opts.forkUrl ? { "--fork-url": opts.forkUrl } : {}),
-    ...(opts.forkBlockNumber
-      ? { "--fork-block-number": `${Number(opts.forkBlockNumber)}` }
-      : {}),
-    ...(opts.blockTime ? { "--block-time": `${opts.blockTime}` } : {}),
-    // TODO: Fill in the other options here and refactor this to make it more readable.
-  }).flatMap(([key, value]) => [key, value]);
-
-  const subprocess = execa("anvil", args, {
+  const subprocess = execa("anvil", toArgs(opts), {
     signal: controller.signal,
     cleanup: true,
     all: true,
@@ -299,6 +290,10 @@ export class Anvil {
 
   public get port() {
     return this.options.port ?? 8545;
+  }
+
+  public get host() {
+    return this.options.host ?? "127.0.0.1";
   }
 
   public get logs() {
