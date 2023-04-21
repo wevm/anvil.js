@@ -1,5 +1,5 @@
+import httpProxy from "http-proxy";
 import { Server, createServer } from "node:http";
-import { createProxyServer } from "http-proxy";
 import { type AnvilOptions } from "./anvil.js";
 import {
   getAnvilInstance,
@@ -7,34 +7,62 @@ import {
   shutdownAnvilInstances,
 } from "./instances.js";
 
-export type AnvilProxyOptions = {
+export type CreateAnvilProxyOptions = {
   anvilOptions?: Omit<AnvilOptions, "port">;
+  /**
+   * The hostname to listen on.
+   *
+   * @defaultValue :: (all interfaces)
+   */
   proxyHostname?: string;
+  /**
+   * The port to listen on.
+   *
+   * @defaultValue 8545
+   */
   proxyPort?: number;
 };
 
-// Using this proxy, we can parallelize our test suite by spawning multiple "on demand" anvil
-// instances and proxying requests to them. Especially for local development, this is much faster
-// than running the tests serially.
-//
-// In vitest, each thread is assigned a unique, numerical id (`process.env.VITEST_POOL_ID`). We
-// append this id to the local rpc url (e.g. `http://127.0.0.1:8545/<ID>`).
-//
-// Whenever a request hits the proxy server at this url, it spawns (or reuses) an anvil instance
-// at a randomly assigned port and proxies the request to it. The anvil instance is added to a
-// [id:port] mapping for future request and is kept alive until the test suite finishes.
-//
-// Since each thread processes one test file after the other, we don't have to worry about
-// non-deterministic behavior caused by multiple tests hitting the same anvil instance concurrently
-// as long as we avoid `test.concurrent()`.
+/**
+ * Using this proxy, we can parallelize our test suite by spawning multiple "on demand" anvil
+ * instances and proxying requests to them. Especially for local development, this is much faster
+ * than running the tests serially.
+ *
+ * In vitest, each thread is assigned a unique, numerical id (`process.env.VITEST_POOL_ID`). We
+ * append this id to the local rpc url (e.g. `http://127.0.0.1:8545/<ID>`).
+ *
+ * Whenever a request hits the proxy server at this url, it spawns (or reuses) an anvil instance
+ * at a randomly assigned port and proxies the request to it. The anvil instance is added to a
+ * [id:port] mapping for future request and is kept alive until the test suite finishes.
+ *
+ * Since each thread processes one test file after the other, we don't have to worry about
+ * non-deterministic behavior caused by multiple tests hitting the same anvil instance concurrently
+ * as long as we avoid `test.concurrent()`.
+ *
+ * @example
+ * ```
+ * // globalSetup.ts
+ * import { createAnvilProxy } from "@fubhy/anvil";
+ *
+ * export default async function () {
+ *   return await createAnvilProxy({
+ *     proxyPort: 8555,
+ *     anvilOptions: {
+ *       forkUrk: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
+ *       blockNumber: 12345678,
+ *     },
+ *   });
+ * }
+ * ```
+ */
 export async function createAnvilProxy({
   proxyPort = 8545,
   proxyHostname = "::",
   anvilOptions,
-}: AnvilProxyOptions = {}) {
+}: CreateAnvilProxyOptions = {}) {
   // rome-ignore lint/suspicious/noAsyncPromiseExecutor: this is fine ...
   const server = await new Promise<Server>(async (resolve, reject) => {
-    const proxy = createProxyServer({
+    const proxy = httpProxy.createProxyServer({
       ignorePath: true,
       ws: true,
     });
@@ -57,7 +85,7 @@ export async function createAnvilProxy({
         const anvil = await getOrCreateAnvilInstance(id, anvilOptions);
 
         proxy.web(req, res, {
-          target: `http://127.0.0.1:${anvil.port}`,
+          target: `http://${anvil.host}:${anvil.port}`,
         });
       } else {
         res.writeHead(404).end("Invalid request");
@@ -73,7 +101,7 @@ export async function createAnvilProxy({
         const anvil = await getOrCreateAnvilInstance(id, anvilOptions);
 
         proxy.ws(req, socket, head, {
-          target: `ws://127.0.0.1:${anvil.port}`,
+          target: `ws://${anvil.host}:${anvil.port}`,
         });
       } else {
         socket.destroy(new Error("Invalid request"));
@@ -94,6 +122,20 @@ export async function createAnvilProxy({
       }),
     ]);
   };
+}
+
+export async function getAnvilProxyLogs(
+  url: string,
+  id: number,
+): Promise<string[]> {
+  const response = await fetch(new URL(`${id}/logs`, url), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return response.json();
 }
 
 function parseRequest(request?: string) {

@@ -1,5 +1,5 @@
-import { createPublicClient, createTestClient, http } from "viem";
-import { anvil } from "./globals.js";
+import { createTestClient, createPublicClient, type Chain, http } from "viem";
+import { localhost } from "viem/chains";
 
 type TupleOf<T, N extends number, R extends unknown[]> = R["length"] extends N
   ? R
@@ -29,3 +29,29 @@ export function createClients<TCount extends number>(count: TCount) {
 
   return output as Tuple<typeof output[number], TCount>;
 }
+
+const id = process.env.VITEST_POOL_ID ?? 1;
+export const anvil = {
+  ...localhost,
+  rpcUrls: {
+    default: {
+      http: [`http://127.0.0.1:8545/${id}`],
+      webSocket: [`ws://127.0.0.1:8545/${id}`],
+    },
+    public: {
+      http: [`http://127.0.0.1:8545/${id}`],
+      webSocket: [`ws://127.0.0.1:8545/${id}`],
+    },
+  },
+} as const satisfies Chain;
+
+export const testClient = createTestClient({
+  chain: anvil,
+  mode: "anvil",
+  transport: http(),
+});
+
+export const publicClient = createPublicClient({
+  chain: anvil,
+  transport: http(),
+});

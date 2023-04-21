@@ -3,6 +3,13 @@ import { startAnvil, type Anvil, type AnvilOptions } from "./anvil.js";
 
 const anvilInstances = new Map<number, Promise<Anvil>>();
 
+/**
+ * Get or create an anvil instance.
+ *
+ * @param id the id of the anvil instance
+ * @param options the options to start the anvil instance with
+ * @returns a promise of the anvil instance
+ */
 export async function getOrCreateAnvilInstance(
   id: number,
   options?: Omit<AnvilOptions, "port">,
@@ -32,6 +39,9 @@ export async function getOrCreateAnvilInstance(
   return anvil;
 }
 
+/**
+ * Attempts to gracefully shutdown all active anvil instances.
+ */
 export async function shutdownAnvilInstances() {
   const instances = Array.from(anvilInstances.values());
   await Promise.allSettled(
@@ -39,6 +49,12 @@ export async function shutdownAnvilInstances() {
   );
 }
 
+/**
+ * Get an anvil instance.
+ *
+ * @param id the id of the anvil instance
+ * @returns a promise the anvil instance or undefined if it doesn't exist
+ */
 export function getAnvilInstance(id: number) {
   return anvilInstances.get(id) ?? undefined;
 }
