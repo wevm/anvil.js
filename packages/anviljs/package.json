@@ -4,7 +4,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wagmi-dev/anvil-jit.git",
+    "url": "https://github.com/wagmi-dev/anviljs.git",
     "directory": "packages/anvil"
   },
   "scripts": {
