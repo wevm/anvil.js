@@ -1,5 +1,11 @@
 # @fubhy/anvil
 
+## 0.0.2
+
+### Patch Changes
+
+- [`b6ddac0`](https://github.com/wagmi-dev/anviljs/commit/b6ddac0aed0762105060684f4aadc5e3796e33ca) Thanks [@fubhy](https://github.com/fubhy)! - Fixed `hardfork` option name
+
 ## 0.0.1
 
 ### Patch Changes
