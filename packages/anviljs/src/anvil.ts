@@ -2,6 +2,23 @@ import { execa, type ExecaChildProcess } from "execa";
 import { Writable } from "node:stream";
 import { toArgs } from "./utils/toArgs.js";
 
+type Hardfork =
+  | "Frontier"
+  | "Homestead"
+  | "Dao"
+  | "Tangerine"
+  | "SpuriousDragon"
+  | "Byzantium"
+  | "Constantinople"
+  | "Petersburg"
+  | "Istanbul"
+  | "Muirglacier"
+  | "Berlin"
+  | "London"
+  | "ArrowGlacier"
+  | "GrayGlacier"
+  | "Latest";
+
 export type AnvilOptions = {
   /**
    * Sets the number of assumed available compute units per second for this fork provider.
@@ -143,7 +160,7 @@ export type AnvilOptions = {
   /**
    * The EVM hardfork to use.
    */
-  hardFork?: string | undefined;
+  hardfork?: Hardfork | undefined;
   /**
    * The host the server will listen on.
    */
