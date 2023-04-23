@@ -1,5 +1,11 @@
 # @fubhy/anvil
 
+## 0.0.3
+
+### Patch Changes
+
+- [`8d2fee6`](https://github.com/wagmi-dev/anviljs/commit/8d2fee66d483706e3a5775294e9121c56bd977f8) Thanks [@fubhy](https://github.com/fubhy)! - Copy readme for publishing
+
 ## 0.0.2
 
 ### Patch Changes
