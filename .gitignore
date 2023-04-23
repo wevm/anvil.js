@@ -22,3 +22,6 @@ coverage/
 
 # Ignore dependencies
 node_modules/
+
+# Copied for publishing
+packages/anvil/README.md
