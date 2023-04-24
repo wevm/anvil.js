@@ -216,6 +216,12 @@ export type AnvilOptions = {
 
 export type StartAnvilOptions = AnvilOptions & {
   /**
+   * Path or alias of the anvil binary.
+   *
+   * @defaultValue anvil
+   */
+  anvilBinary?: string;
+  /**
    * Allowed time for anvil to start up in milliseconds.
    *
    * @defaultValue 10_000
@@ -224,55 +230,82 @@ export type StartAnvilOptions = AnvilOptions & {
 };
 
 export function startAnvil({
+  anvilBinary = "anvil",
   startUpTimeout = 10_000,
   ...opts
 }: StartAnvilOptions = {}) {
+  let status: "resolved" | "rejected" | "pending" = "pending";
   let resolve: (value: Anvil) => void = () => {};
   let reject: (reason: Error) => void = () => {};
 
+  setTimeout(
+    () => reject(new Error("Anvil failed to start in time")),
+    startUpTimeout
+  );
+
   const resolvable = new Promise<Anvil>((resolve_, reject_) => {
-    resolve = resolve_;
-    reject = reject_;
-
-    // If anvil fails to start up in time, we reject the promise.
-    setTimeout(() => {
-      let message = "Anvil failed to start in time";
-      const logs = recorder.flush();
-
-      if (logs.length > 0) {
-        message += `:\n\n${logs.join("\n")}}`;
+    resolve = (value: Anvil) => {
+      if (status === "pending") {
+        status = "resolved";
+        resolve_(value);
       }
+    };
 
-      reject(new Error(message));
-    }, startUpTimeout);
+    reject = async (reason: Error) => {
+      if (status === "pending") {
+        status = "rejected";
+
+        try {
+          if (!controller.signal.aborted) {
+            controller.abort();
+          }
+
+          await subprocess;
+        } catch {
+        } finally {
+          reject_(reason);
+        }
+      }
+    };
   });
-
-  // We know that anvil has started when it prints this message.
-  const host = opts.host ?? "127.0.0.1";
-  const port = opts.port ?? 8545;
-  const message = `Listening on ${host}:${port}`;
-  let started = false;
 
   const controller = new AbortController();
   const recorder = new LogRecorder((value) => {
-    if (!started && value.includes(message)) {
-      started = true;
-      resolve(instance);
+    if (status === "pending") {
+      const host = opts.host ?? "127.0.0.1";
+      const port = opts.port ?? 8545;
+
+      // We know that anvil has started when it prints this message.
+      if (value.includes(`Listening on ${host}:${port}`)) {
+        resolve(new Anvil(subprocess, controller, recorder, opts));
+      }
     }
   });
 
-  const subprocess = execa("anvil", toArgs(opts), {
+  const subprocess = execa(anvilBinary, toArgs(opts), {
     signal: controller.signal,
     cleanup: true,
     all: true,
   });
 
-  // Assign the anvil instance that is returned from the promise.
-  const instance = new Anvil(subprocess, controller, recorder, opts);
-
   // rome-ignore lint/style/noNonNullAssertion: this is guaranteed to be set with `all: true`.
   subprocess.pipeAll!(recorder);
-  subprocess.catch((error) => reject(error));
+  subprocess.once("error", (error) => {
+    if (status === "pending") {
+      reject(new Error(`Anvil errored: ${error}`));
+    }
+  });
+
+  subprocess.once("exit", (_, signal) => {
+    if (status === "pending") {
+      const [log] = recorder.flush().slice(-1);
+      const message = `Anvil failed to start (${signal})${
+        log !== undefined ? `: ${log}` : ""
+      }`;
+
+      reject(new Error(message));
+    }
+  });
 
   return resolvable;
 }
@@ -287,7 +320,7 @@ export class Anvil {
     subprocess: ExecaChildProcess,
     controller: AbortController,
     recorder: LogRecorder,
-    options: AnvilOptions,
+    options: AnvilOptions
   ) {
     this.process = subprocess;
     this.controller = controller;

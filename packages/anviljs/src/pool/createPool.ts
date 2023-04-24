@@ -3,16 +3,27 @@ import { startAnvil, Anvil, type AnvilOptions } from "../anvil/startAnvil.js";
 
 export type Pool<TKey> = ReturnType<typeof createPool<TKey>>;
 
-export function createPool<TKey>() {
+export type PoolOptions = {
+  instanceLimit?: number;
+};
+
+export function createPool<TKey>({ instanceLimit }: PoolOptions = {}) {
   const instances = new Map<TKey, Promise<Anvil>>();
 
   return {
+    get size() {
+      return instances.size;
+    },
     instances: () => instances.entries(),
     has: (id: TKey) => instances.has(id),
     get: (id: TKey) => instances.get(id),
     create: async (id: TKey, options?: AnvilOptions) => {
       if (instances.has(id)) {
-        throw new Error("");
+        throw new Error(`Anvil instance with id "${id}" already exists`);
+      }
+
+      if (instanceLimit !== undefined && instances.size + 1 >= instanceLimit) {
+        throw new Error(`Anvil instance limit of ${instanceLimit} reached`);
       }
 
       // rome-ignore lint/suspicious/noAsyncPromiseExecutor: <explanation>
@@ -36,13 +47,12 @@ export function createPool<TKey>() {
     close: async (id: TKey) => {
       const anvil = instances.get(id);
 
-      if (anvil !== undefined) {
-        instances.delete(id);
-
-        try {
-          await (await anvil).exit();
-        } catch {}
+      if (anvil === undefined) {
+        throw new Error(`Anvil instance with id "${id}" doesn't exist`);
       }
+
+      instances.delete(id);
+      await (await anvil).exit();
     },
   } as const;
 }

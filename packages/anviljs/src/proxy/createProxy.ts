@@ -44,14 +44,22 @@ export function createProxy({ pool, options }: CreateProxyOptions) {
     const { id, path } = parseRequest(req.url);
 
     if (id === undefined) {
-      res.writeHead(404).end("Missing worker id in request");
+      res.writeHead(404).end("Missing instance id in request");
     } else if (path === "/logs") {
       const anvil = await pool.get(id);
 
-      if (anvil === undefined) {
-        res.writeHead(404).end(`No anvil instance found for id ${id}`);
+      if (anvil !== undefined) {
+        const output = JSON.stringify((await anvil.logs) ?? []);
+        res.writeHead(200).end(output);
       } else {
-        res.writeHead(200).end(JSON.stringify((await anvil.logs) ?? []));
+        res.writeHead(404).end(`Anvil instance doesn't exists.`);
+      }
+    } else if (path === "/shutdown") {
+      if (pool.has(id)) {
+        const output = JSON.stringify({ success: await pool.close(id) });
+        res.writeHead(200).end(output);
+      } else {
+        res.writeHead(404).end(`Anvil instance doesn't exists.`);
       }
     } else if (path === "/") {
       const anvil =
@@ -73,7 +81,7 @@ export function createProxy({ pool, options }: CreateProxyOptions) {
     const { id, path } = parseRequest(req.url);
 
     if (id === undefined) {
-      socket.destroy(new Error("Missing worker id in request"));
+      socket.destroy(new Error("Anvil instance doesn't exists."));
     } else if (path === "/") {
       const anvil =
         (await pool.get(id)) ??
