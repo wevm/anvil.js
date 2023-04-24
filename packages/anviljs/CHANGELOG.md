@@ -1,5 +1,11 @@
 # @fubhy/anvil
 
+## 0.0.4
+
+### Patch Changes
+
+- [`9a7ce99`](https://github.com/wagmi-dev/anviljs/commit/9a7ce99e01274ccd0dc9b20915024c1ba7f74fb0) Thanks [@fubhy](https://github.com/fubhy)! - Improved structure & composability
+
 ## 0.0.3
 
 ### Patch Changes
