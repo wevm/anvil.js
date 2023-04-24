@@ -88,7 +88,7 @@ export function makeStartAnvilWithCleanup(
     );
   });
 
-  return function (options: StartAnvilOptions) {
+  return function (options?: StartAnvilOptions) {
     const anvil = startAnvil(options);
     instances.push(anvil);
     return anvil;
