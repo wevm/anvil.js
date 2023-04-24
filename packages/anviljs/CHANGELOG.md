@@ -1,5 +1,11 @@
 # @fubhy/anvil
 
+## 0.0.5
+
+### Patch Changes
+
+- [`19106bb`](https://github.com/wagmi-dev/anviljs/commit/19106bb654365ac12e742951311ba6696b9850c1) Thanks [@fubhy](https://github.com/fubhy)! - Improved startup handling
+
 ## 0.0.4
 
 ### Patch Changes
