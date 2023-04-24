@@ -3,10 +3,16 @@ export {
   type AnvilOptions,
   type StartAnvilOptions,
   startAnvil,
-} from "./anvil.js";
+} from "./anvil/startAnvil.js";
 
 export {
-  type CreateAnvilProxyOptions,
-  createAnvilProxy,
-  getAnvilProxyLogs,
-} from "./proxy.js";
+  type CreateProxyOptions,
+  createProxy,
+} from "./proxy/createProxy.js";
+
+export {
+  type StartProxyOptions,
+  startProxy,
+} from "./proxy/startProxy.js";
+
+export { fetchLogs } from "./proxy/fetchLogs.js";

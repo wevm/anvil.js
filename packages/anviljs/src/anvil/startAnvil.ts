@@ -1,6 +1,6 @@
 import { execa, type ExecaChildProcess } from "execa";
 import { Writable } from "node:stream";
-import { toArgs } from "./utils/toArgs.js";
+import { toArgs } from "./toArgs.js";
 
 type Hardfork =
   | "Frontier"

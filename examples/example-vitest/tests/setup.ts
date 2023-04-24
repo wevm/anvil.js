@@ -1,4 +1,4 @@
-import { getAnvilProxyLogs } from "@fubhy/anvil";
+import { fetchLogs } from "@fubhy/anvil";
 import { afterAll, afterEach } from "vitest";
 import { pool, testClient } from "./utils.js";
 import { FORK_BLOCK_NUMBER, FORK_URL } from "./constants.js";
@@ -14,7 +14,7 @@ afterAll(async () => {
 afterEach((context) => {
   context.onTestFailed(async () => {
     // If a test fails, you can fetch and print the logs of your anvil instance.
-    const logs = await getAnvilProxyLogs("http://localhost:8545", pool);
+    const logs = await fetchLogs("http://localhost:8545", pool);
     // Only print the 20 most recent log messages.
     console.log(logs.slice(-20));
   });

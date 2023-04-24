@@ -1,0 +1,94 @@
+import httpProxy from "http-proxy";
+import { IncomingMessage, createServer } from "node:http";
+import { parseRequest } from "./parseRequest.js";
+import { type Pool } from "../pool/createPool.js";
+import type { Awaitable } from "vitest";
+import type { StartAnvilOptions } from "../anvil/startAnvil.js";
+
+export type AnvilProxyOptions =
+  | StartAnvilOptions
+  | ((id: number, request: IncomingMessage) => Awaitable<StartAnvilOptions>);
+
+export type CreateProxyOptions = {
+  pool: Pool<number>;
+  options?: AnvilProxyOptions | undefined;
+};
+
+/**
+ * Creates a proxy server that spawns an anvil instance for each request.
+ *
+ * @example
+ * ```
+ * import { createProxy, createPool } from "@fubhy/anvil";
+ *
+ * const server = const createProxy({
+ *   pool: createPool<number>(),
+ *   options: {
+ *     forkUrk: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
+ *     blockNumber: 12345678,
+ *   },
+ * });
+ *
+ * server.listen(8545, "::", () => {
+ *   console.log("Proxy server listening on http://0.0.0.0:8545");
+ * });
+ * ```
+ */
+export function createProxy({ pool, options }: CreateProxyOptions) {
+  const proxy = httpProxy.createProxyServer({
+    ignorePath: true,
+    ws: true,
+  });
+
+  const server = createServer(async (req, res) => {
+    const { id, path } = parseRequest(req.url);
+
+    if (id === undefined) {
+      res.writeHead(404).end("Missing worker id in request");
+    } else if (path === "/logs") {
+      const anvil = await pool.get(id);
+
+      if (anvil === undefined) {
+        res.writeHead(404).end(`No anvil instance found for id ${id}`);
+      } else {
+        res.writeHead(200).end(JSON.stringify((await anvil.logs) ?? []));
+      }
+    } else if (path === "/") {
+      const anvil =
+        (await pool.get(id)) ??
+        (await pool.create(
+          id,
+          typeof options === "function" ? await options(id, req) : options,
+        ));
+
+      proxy.web(req, res, {
+        target: `http://${anvil.host}:${anvil.port}`,
+      });
+    } else {
+      res.writeHead(404).end("Invalid request");
+    }
+  });
+
+  server.on("upgrade", async (req, socket, head) => {
+    const { id, path } = parseRequest(req.url);
+
+    if (id === undefined) {
+      socket.destroy(new Error("Missing worker id in request"));
+    } else if (path === "/") {
+      const anvil =
+        (await pool.get(id)) ??
+        (await pool.create(
+          id,
+          typeof options === "function" ? await options(id, req) : options,
+        ));
+
+      proxy.ws(req, socket, head, {
+        target: `ws://${anvil.host}:${anvil.port}`,
+      });
+    } else {
+      socket.destroy(new Error("Invalid request"));
+    }
+  });
+
+  return server;
+}
