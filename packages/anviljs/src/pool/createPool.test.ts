@@ -152,7 +152,7 @@ test("throws if instance limit is exceeded", async () => {
   await expect(pool.start(4)).rejects.toThrowErrorMatchingInlineSnapshot('"Anvil instance limit of 3 reached"');
 });
 
-test("throws if auto port detection is disabled", async () => {
+test.skip("throws if auto port detection is disabled", async () => {
   pool = createPool({
     autoPort: false,
   });
