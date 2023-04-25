@@ -1,16 +1,21 @@
-<br/>
-
 # AnvilJS
 
 TypeScript wrapper for Foundry [Anvil](https://github.com/foundry-rs/foundry/tree/master/anvil).
 
-> Anvil is a local testnet node shipped with Foundry. You can use it for testing your contracts from frontends or for interacting over RPC. Anvil is part of the Foundry suite and is installed alongside `forge`, `cast`, and `chisel`.
+## Install
 
-Please refer to the [foundry book](https://book.getfoundry.sh) for Anvil [installation instructions](https://book.getfoundry.sh/getting-started/installation).
+```bash
+npm i @viem/anvil
+yarn add @viem/anvil
+pnpm add @viem/anvil
+```
+
+> **Note**
+> Anvil is required to use `@viem/anvil`. Please refer to the [foundry book](https://book.getfoundry.sh) for Anvil [installation instructions](https://book.getfoundry.sh/getting-started/installation).
 
 ## Overview
 
-TODO
+AnvilJS provides a simple API to spawn and manage Anvil instances.
 
 ## API
 
