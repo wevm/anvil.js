@@ -1,6 +1,6 @@
 import { afterAll, expect, test } from "vitest";
-import { createProxyClients } from "./utils.js";
-import { FORK_BLOCK_NUMBER, FORK_URL } from "./constants.js";
+import { createProxyClients } from "./utils/utils.js";
+import { FORK_BLOCK_NUMBER, FORK_URL } from "./utils/constants.js";
 
 const clients = createProxyClients([1, 2, 3] as const);
 
@@ -15,7 +15,7 @@ afterAll(async () => {
   );
 });
 
-test("workbench", async () => {
+test("proxy workbench", async () => {
   const [a, b, c] = clients;
 
   await expect(

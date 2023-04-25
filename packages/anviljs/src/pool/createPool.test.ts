@@ -1,7 +1,6 @@
 import { expect, test, afterEach, beforeEach } from "vitest";
 import { createPool, type Pool } from "./createPool.js";
-import { Anvil } from "../anvil/startAnvil.js";
-import { createAnvilClients } from "../../tests/utils.js";
+import { createAnvilClients } from "../../tests/utils/utils.js";
 
 let pool: Pool<number>;
 beforeEach(() => {
@@ -10,91 +9,91 @@ beforeEach(() => {
 
 afterEach(async () => {
   const instances = Array.from(pool.instances());
-  await Promise.allSettled(instances.map(([id]) => pool.close(id)));
+  await Promise.allSettled(instances.map(([id]) => pool.stop(id)));
 });
 
 test("should create instances with different ids", async () => {
-  await expect(pool.create(1)).resolves.toBeInstanceOf(Anvil);
-  await expect(pool.create(2)).resolves.toBeInstanceOf(Anvil);
-  await expect(pool.create(1337)).resolves.toBeInstanceOf(Anvil);
+  await expect(pool.start(1)).resolves.toBeDefined();
+  await expect(pool.start(2)).resolves.toBeDefined();
+  await expect(pool.start(1337)).resolves.toBeDefined();
 });
 
 test("can get an instance from the pool after creating it", async () => {
-  const a = await pool.create(1);
-  const b = await pool.create(2);
+  const a = await pool.start(1);
+  const b = await pool.start(2);
   await expect(pool.get(1)).resolves.toBe(a);
   await expect(pool.get(2)).resolves.toBe(b);
   expect(pool.get(3)).toBe(undefined);
 });
 
 test("can use `has` to check if an instance exists", async () => {
-  await pool.create(1);
-  await pool.create(2);
+  await pool.start(1);
+  await pool.start(2);
   expect(pool.has(1)).toBe(true);
   expect(pool.has(2)).toBe(true);
   expect(pool.has(3)).toBe(false);
 });
 
 test("can't create multiple instances with the same id", async () => {
-  await expect(pool.create(1)).resolves.toBeInstanceOf(Anvil);
-  await expect(pool.create(2)).resolves.toBeInstanceOf(Anvil);
-  await expect(pool.create(1)).rejects.toMatchInlineSnapshot(
+  await expect(pool.start(1)).resolves.toBeDefined();
+  await expect(pool.start(2)).resolves.toBeDefined();
+  await expect(pool.start(1)).rejects.toMatchInlineSnapshot(
     '[Error: Anvil instance with id "1" already exists]',
   );
 });
 
 test("can retrieve the size of a pool", async () => {
   expect(pool.size).toBe(0);
-  await pool.create(1);
+  await pool.start(1);
   expect(pool.size).toBe(1);
-  await pool.create(2);
+  await pool.start(2);
   expect(pool.size).toBe(2);
 });
 
 test("can retrieve all active instances", async () => {
-  await pool.create(1);
-  await pool.create(2);
+  await pool.start(1);
+  await pool.start(2);
 
   const instances = Array.from(pool.instances());
   expect(instances).toHaveLength(2);
-  await expect((await instances[0])?.[1]).resolves.toBeInstanceOf(Anvil);
-  await expect((await instances[1])?.[1]).resolves.toBeInstanceOf(Anvil);
+  await expect((await instances[0])?.[1]).resolves.toBeDefined();
+  await expect((await instances[1])?.[1]).resolves.toBeDefined();
 });
 
 test("can close instances", async () => {
-  await pool.create(1);
-  await pool.create(2);
+  await pool.start(1);
+  await pool.start(2);
   expect(pool.has(1)).toBe(true);
   expect(pool.has(2)).toBe(true);
   expect(pool.has(3)).toBe(false);
 
-  await expect(pool.close(1)).resolves.toBe(undefined);
-  await expect(pool.close(2)).resolves.toBe(undefined);
+  await expect(pool.stop(1)).resolves.toBe(undefined);
+  await expect(pool.stop(2)).resolves.toBe(undefined);
   expect(pool.has(1)).toBe(false);
   expect(pool.has(2)).toBe(false);
   expect(pool.has(3)).toBe(false);
 });
 
 test("throws when trying to close an instance that doesn't exist", async () => {
-  await pool.create(1);
-  await expect(pool.close(1)).resolves.toBe(undefined);
-  await expect(pool.close(2)).rejects.toThrowErrorMatchingInlineSnapshot(
+  await pool.start(1);
+  await expect(pool.stop(1)).resolves.toBe(undefined);
+  await expect(pool.stop(2)).rejects.toThrowErrorMatchingInlineSnapshot(
     '"Anvil instance with id \\"2\\" doesn\'t exist"',
   );
 });
 
 test("can use the same ids after closing instances", async () => {
-  const first = await pool.create(1);
-  await expect(pool.create(1)).rejects.toThrow();
-  const second = await pool.close(1);
-  await expect(pool.create(1)).resolves.toBeInstanceOf(Anvil);
+  const first = await pool.start(1);
+  await expect(pool.start(1)).rejects.toThrow();
+  const second = await pool.stop(1);
+  await expect(pool.start(1)).resolves.toBeDefined();
   expect(first).not.toBe(second);
 });
 
 test("can create instances with different options", async () => {
   {
     const { publicClient, walletClient } = createAnvilClients(
-      await pool.create(1, {
+      await pool.start(1, {
         accounts: 5,
         balance: 1_000n,
         chainId: 123,
@@ -120,7 +119,7 @@ test("can create instances with different options", async () => {
 
   {
     const { publicClient, walletClient } = createAnvilClients(
-      await pool.create(2, {
+      await pool.start(2, {
         accounts: 2,
         balance: 543n,
         chainId: 321,

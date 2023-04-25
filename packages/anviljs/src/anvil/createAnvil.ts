@@ -1,5 +1,6 @@
 import { execa, type ExecaChildProcess } from "execa";
 import { Writable } from "node:stream";
+import { EventEmitter } from "node:events";
 import { toArgs } from "./toArgs.js";
 
 type Hardfork =
@@ -214,7 +215,7 @@ export type AnvilOptions = {
   transactionBlockKeeper?: number | undefined;
 };
 
-export type StartAnvilOptions = AnvilOptions & {
+export type CreateAnvilOptions = AnvilOptions & {
   /**
    * Path or alias of the anvil binary.
    *
@@ -226,155 +227,240 @@ export type StartAnvilOptions = AnvilOptions & {
    *
    * @defaultValue 10_000
    */
-  startUpTimeout?: number | undefined;
+  startTimeout?: number | undefined;
+  /**
+   * Allowed time for anvil to stop gracefully up in milliseconds.
+   *
+   * @defaultValue 10_000
+   */
+  stopTimeout?: number | undefined;
 };
 
-export function startAnvil({
-  anvilBinary = "anvil",
-  startUpTimeout = 10_000,
-  ...opts
-}: StartAnvilOptions = {}) {
-  let status: "resolved" | "rejected" | "pending" = "pending";
-  let resolve: (value: Anvil) => void = () => {};
-  let reject: (reason: Error) => void = () => {};
+const colors =
+  /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
 
-  setTimeout(
-    () => reject(new Error("Anvil failed to start in time")),
-    startUpTimeout
-  );
+export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
+  const emitter = new EventEmitter();
+  const logs: string[] = [];
 
-  const resolvable = new Promise<Anvil>((resolve_, reject_) => {
-    resolve = (value: Anvil) => {
-      if (status === "pending") {
-        status = "resolved";
-        resolve_(value);
+  emitter.on("message", (message: string) => {
+    logs.push(message);
+
+    if (logs.length > 20) {
+      logs.shift();
+    }
+  });
+
+  let anvil: ExecaChildProcess | undefined;
+  let controller: AbortController | undefined;
+  let status: "idle" | "starting" | "stopping" | "listening" = "idle";
+
+  const {
+    anvilBinary = "anvil",
+    startTimeout = 10_000,
+    stopTimeout = 10_000,
+    ...anvilOptions
+  } = options;
+
+  const stdout = new Writable({
+    write(chunk, _, callback) {
+      try {
+        const message = (chunk.toString() as string).replace(colors, "");
+        emitter.emit("message", message);
+        emitter.emit("stdout", message);
+        callback();
+      } catch (error) {
+        callback(
+          error instanceof Error
+            ? error
+            : new Error(typeof error === "string" ? error : undefined),
+        );
       }
-    };
+    },
+  });
 
-    reject = async (reason: Error) => {
-      if (status === "pending") {
-        status = "rejected";
+  const stderr = new Writable({
+    write(chunk, _, callback) {
+      try {
+        const message = (chunk.toString() as string)
+          .replace(colors, "")
+          .replace("\n", "");
+        emitter.emit("message", message);
+        emitter.emit("stderr", message);
+        callback();
+      } catch (error) {
+        callback(
+          error instanceof Error
+            ? error
+            : new Error(typeof error === "string" ? error : undefined),
+        );
+      }
+    },
+  });
+
+  async function start() {
+    if (status !== "idle") {
+      throw new Error("Anvil instance not idle");
+    }
+
+    status = "starting";
+
+    // rome-ignore lint/suspicious/noAsyncPromiseExecutor: <explanation>
+    return new Promise<void>(async (resolve, reject) => {
+      let log: string | undefined = undefined;
+
+      async function setFailed(reason: Error) {
+        status = "stopping";
+
+        clearTimeout(timeout);
+        emitter.off("message", onMessage);
+        emitter.off("exit", onExit);
 
         try {
-          if (!controller.signal.aborted) {
+          if (controller !== undefined && !controller?.signal.aborted) {
             controller.abort();
           }
 
-          await subprocess;
-        } catch {
-        } finally {
-          reject_(reason);
+          await anvil;
+        } catch {}
+
+        status = "idle";
+        reject(reason);
+      }
+
+      function setStarted() {
+        status = "listening";
+
+        clearTimeout(timeout);
+        emitter.off("message", onMessage);
+        emitter.off("exit", onExit);
+
+        resolve();
+      }
+
+      function onExit() {
+        if (status === "starting") {
+          if (log !== undefined) {
+            setFailed(new Error(`Anvil exited: ${log}`));
+          } else {
+            setFailed(new Error("Anvil exited"));
+          }
         }
       }
-    };
-  });
 
-  const controller = new AbortController();
-  const recorder = new LogRecorder((value) => {
-    if (status === "pending") {
-      const host = opts.host ?? "127.0.0.1";
-      const port = opts.port ?? 8545;
+      function onMessage(message: string) {
+        log = message;
 
-      // We know that anvil has started when it prints this message.
-      if (value.includes(`Listening on ${host}:${port}`)) {
-        resolve(new Anvil(subprocess, controller, recorder, opts));
+        if (status === "starting") {
+          const host = options.host ?? "127.0.0.1";
+          const port = options.port ?? 8545;
+
+          // We know that anvil is listening when it prints this message.
+          if (message.includes(`Listening on ${host}:${port}`)) {
+            setStarted();
+          }
+        }
       }
-    }
-  });
 
-  const subprocess = execa(anvilBinary, toArgs(opts), {
-    signal: controller.signal,
-    cleanup: true,
-    all: true,
-  });
+      emitter.on("exit", onExit);
+      emitter.on("message", onMessage);
 
-  // rome-ignore lint/style/noNonNullAssertion: this is guaranteed to be set with `all: true`.
-  subprocess.pipeAll!(recorder);
-  subprocess.once("error", (error) => {
-    if (status === "pending") {
-      reject(new Error(`Anvil errored: ${error}`));
-    }
-  });
+      const timeout = setTimeout(() => {
+        setFailed(new Error("Anvil failed to start in time"));
+      }, startTimeout);
 
-  subprocess.once("exit", (_, signal) => {
-    if (status === "pending") {
-      const [log] = recorder.flush().slice(-1);
-      const message = `Anvil failed to start (${signal})${
-        log !== undefined ? `: ${log}` : ""
-      }`;
+      controller = new AbortController();
+      anvil = execa(anvilBinary, toArgs(anvilOptions), {
+        signal: controller.signal,
+        cleanup: true,
+      });
 
-      reject(new Error(message));
-    }
-  });
+      anvil.on("closed", () => emitter.emit("closed"));
+      anvil.on("exit", (code, signal) => {
+        emitter.emit("exit", code ?? undefined, signal ?? undefined);
+      });
 
-  return resolvable;
-}
-
-export class Anvil {
-  public readonly options: AnvilOptions;
-  public readonly process: ExecaChildProcess;
-  private readonly controller: AbortController;
-  private readonly recorder: LogRecorder;
-
-  constructor(
-    subprocess: ExecaChildProcess,
-    controller: AbortController,
-    recorder: LogRecorder,
-    options: AnvilOptions
-  ) {
-    this.process = subprocess;
-    this.controller = controller;
-    this.recorder = recorder;
-    this.options = options;
+      // rome-ignore lint/style/noNonNullAssertion: <explanation>
+      anvil.pipeStdout!(stdout);
+      // rome-ignore lint/style/noNonNullAssertion: <explanation>
+      anvil.pipeStderr!(stderr);
+    });
   }
 
-  public async exit(reason?: string) {
-    if (!this.controller.signal.aborted) {
-      this.controller.abort(reason);
+  async function stop() {
+    if (status === "idle") {
+      return;
     }
+
+    const timeout = new Promise<void>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("Anvil failed to stop in time"));
+      }, stopTimeout);
+    });
+
+    const closed = new Promise<void>((resolve) => {
+      anvil?.once("close", () => resolve());
+    });
 
     try {
-      await this.process;
+      if (controller !== undefined && !controller?.signal.aborted) {
+        controller.abort();
+      }
+
+      await anvil;
     } catch {}
+
+    status = "idle";
+    anvil = undefined;
+    controller = undefined;
+
+    return Promise.race([closed, timeout]);
   }
 
-  public get port() {
-    return this.options.port ?? 8545;
-  }
+  return {
+    start,
+    stop,
+    // rome-ignore lint/suspicious/noExplicitAny: <explanation>
+    on: (event: string, listener: any) => {
+      emitter.on(event, listener);
 
-  public get host() {
-    return this.options.host ?? "127.0.0.1";
-  }
-
-  public get logs() {
-    return this.recorder.flush();
-  }
+      return () => {
+        emitter.off(event, listener);
+      };
+    },
+    get status() {
+      return status;
+    },
+    get logs() {
+      return logs.slice();
+    },
+    get port() {
+      return options.port ?? 8545;
+    },
+    get host() {
+      return options.host ?? "127.0.0.1";
+    },
+    get options() {
+      // NOTE: This is effectively a safe, readonly copy because the options are a flat object.
+      return { ...options };
+    },
+  };
 }
 
-class LogRecorder extends Writable {
-  private readonly callback: (message: string) => void;
-  private readonly messages: string[] = [];
-
-  constructor(callback: (message: string) => void) {
-    super();
-    this.callback = callback;
-  }
-
-  // rome-ignore lint/suspicious/noExplicitAny: that's literally the type here ...
-  override _write(chunk: any, _: string, next: (error?: Error) => void) {
-    const message = chunk.toString().trim();
-    this.messages.push(message);
-
-    // Limit the number of messages we store.
-    if (this.messages.length > 100) {
-      this.messages.shift();
-    }
-
-    this.callback(message);
-    next();
-  }
-
-  public flush() {
-    return this.messages.splice(0, this.messages.length);
-  }
-}
+export type Anvil = {
+  start(): Promise<void>;
+  stop(): Promise<void>;
+  on(event: "message", listener: (message: string) => void): () => void;
+  on(event: "stderr", listener: (message: string) => void): () => void;
+  on(event: "stdout", listener: (message: string) => void): () => void;
+  on(event: "closed", listener: () => void): () => void;
+  on(
+    event: "exit",
+    listener: (code?: number, signal?: NodeJS.Signals) => void,
+  ): () => void;
+  readonly status: "idle" | "starting" | "stopping" | "listening";
+  readonly logs: string[];
+  readonly port: number;
+  readonly host: string;
+  readonly options: CreateAnvilOptions;
+};

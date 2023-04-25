@@ -3,11 +3,11 @@ import { IncomingMessage, createServer } from "node:http";
 import { parseRequest } from "./parseRequest.js";
 import { type Pool } from "../pool/createPool.js";
 import type { Awaitable } from "vitest";
-import type { StartAnvilOptions } from "../anvil/startAnvil.js";
+import type { CreateAnvilOptions } from "../anvil/createAnvil.js";
 
 export type AnvilProxyOptions =
-  | StartAnvilOptions
-  | ((id: number, request: IncomingMessage) => Awaitable<StartAnvilOptions>);
+  | CreateAnvilOptions
+  | ((id: number, request: IncomingMessage) => Awaitable<CreateAnvilOptions>);
 
 export type CreateProxyOptions = {
   pool: Pool<number>;
@@ -56,7 +56,7 @@ export function createProxy({ pool, options }: CreateProxyOptions) {
       }
     } else if (path === "/shutdown") {
       if (pool.has(id)) {
-        const output = JSON.stringify({ success: await pool.close(id) });
+        const output = JSON.stringify({ success: await pool.stop(id) });
         res.writeHead(200).end(output);
       } else {
         res.writeHead(404).end(`Anvil instance doesn't exists.`);
@@ -64,7 +64,7 @@ export function createProxy({ pool, options }: CreateProxyOptions) {
     } else if (path === "/") {
       const anvil =
         (await pool.get(id)) ??
-        (await pool.create(
+        (await pool.start(
           id,
           typeof options === "function" ? await options(id, req) : options,
         ));
@@ -85,7 +85,7 @@ export function createProxy({ pool, options }: CreateProxyOptions) {
     } else if (path === "/") {
       const anvil =
         (await pool.get(id)) ??
-        (await pool.create(
+        (await pool.start(
           id,
           typeof options === "function" ? await options(id, req) : options,
         ));

@@ -6,18 +6,7 @@ import {
   createWalletClient,
 } from "viem";
 import { localhost } from "viem/chains";
-import {
-  startAnvil,
-  type Anvil,
-  type StartAnvilOptions,
-} from "../src/anvil/startAnvil.js";
-import {
-  type afterAll,
-  type afterEach,
-  type beforeAll,
-  type Awaitable,
-} from "vitest";
-import type { beforeEach } from "node:test";
+import type { Anvil } from "../../src/anvil/createAnvil.js";
 
 type TupleOf<T, N extends number, R extends unknown[]> = R["length"] extends N
   ? R
@@ -50,7 +39,7 @@ export function createProxyClients<TIds extends readonly number[]>(ids: TIds) {
     return { publicClient, testClient, walletClient } as const;
   });
 
-  return output as Tuple<(typeof output)[number], TIds["length"]>;
+  return output as Tuple<typeof output[number], TIds["length"]>;
 }
 
 export function createAnvilClients(instance: Anvil) {
@@ -71,28 +60,6 @@ export function createAnvilClients(instance: Anvil) {
   });
 
   return { publicClient, testClient, walletClient } as const;
-}
-
-export function makeStartAnvilWithCleanup(
-  hook:
-    | typeof afterEach
-    | typeof beforeEach
-    | typeof afterAll
-    | typeof beforeAll
-) {
-  const instances: Awaitable<Anvil>[] = [];
-
-  hook(async () => {
-    await Promise.allSettled(
-      instances.map(async (anvil) => (await anvil).exit())
-    );
-  });
-
-  return function (options?: StartAnvilOptions) {
-    const anvil = startAnvil(options);
-    instances.push(anvil);
-    return anvil;
-  };
 }
 
 const id = process.env.VITEST_POOL_ID ?? 1;

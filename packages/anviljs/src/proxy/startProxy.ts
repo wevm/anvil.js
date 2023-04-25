@@ -68,13 +68,10 @@ export async function startProxy({
   });
 
   return async () => {
-    const instances = Array.from(pool.instances());
+    const shutdown = new Promise<void>((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()));
+    });
 
-    await Promise.allSettled([
-      ...instances.map(async ([, anvil]) => (await anvil).exit()),
-      new Promise<void>((resolve, reject) => {
-        server.close((error) => (error ? reject(error) : resolve()));
-      }),
-    ]);
+    await Promise.allSettled([pool.empty(), shutdown]);
   };
 }
