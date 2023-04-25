@@ -128,5 +128,5 @@ test("can subscribe to stderr", async () => {
   await expect(second.start()).rejects.toThrow("Anvil exited");
 
   expect(messages.length).toBeGreaterThanOrEqual(1);
-  expect(messages[0]).toMatch("thread 'main' panicked");
+  expect(messages.join('')).toMatch("thread 'main' panicked");
 });
