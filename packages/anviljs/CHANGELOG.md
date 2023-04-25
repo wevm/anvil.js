@@ -1,5 +1,11 @@
 # @fubhy/anvil
 
+## 0.0.6
+
+### Patch Changes
+
+- [`bee120e`](https://github.com/wagmi-dev/anviljs/commit/bee120e2f670650c53945c6fa988660dcb9305e9) Thanks [@fubhy](https://github.com/fubhy)! - Added ability to subscribe to logs and other events
+
 ## 0.0.5
 
 ### Patch Changes
