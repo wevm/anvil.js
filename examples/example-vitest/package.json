@@ -7,7 +7,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "viem": "^0.3.6"
+    "viem": "^0.3.11"
   },
   "devDependencies": {
     "@fubhy/anvil": "latest",
