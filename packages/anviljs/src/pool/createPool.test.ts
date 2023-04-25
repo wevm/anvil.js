@@ -140,3 +140,38 @@ test("can create instances with different options", async () => {
     `);
   }
 });
+
+test("throws if instance limit is exceeded", async () => {
+  pool = createPool({
+    instanceLimit: 3,
+  });
+
+  await expect(pool.start(1)).resolves.toBeDefined();
+  await expect(pool.start(2)).resolves.toBeDefined();
+  await expect(pool.start(3)).resolves.toBeDefined();
+  await expect(pool.start(4)).rejects.toThrowErrorMatchingInlineSnapshot('"Anvil instance limit of 3 reached"');
+});
+
+test("throws if auto port detection is disabled", async () => {
+  pool = createPool({
+    autoPort: false,
+  });
+
+  await expect(pool.start(1)).resolves.toBeDefined();
+  await expect(pool.start(2)).rejects.toThrow('Anvil exited');
+});
+
+test("empty closes all instance", async () => {
+  await pool.start(1);
+  await pool.start(2);
+  await pool.start(3);
+  await pool.start(4);
+
+  expect(pool.get(1)).toBeDefined();
+  expect(pool.get(2)).toBeDefined();
+  expect(pool.get(3)).toBeDefined();
+  expect(pool.get(4)).toBeDefined();
+
+  await pool.empty();
+  expect(pool.get(1)).toBeUndefined();
+});

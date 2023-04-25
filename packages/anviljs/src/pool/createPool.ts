@@ -32,7 +32,7 @@ export function createPool<TKey = number>({
       throw new Error(`Anvil instance with id "${id}" already exists`);
     }
 
-    if (instanceLimit !== undefined && instances.size + 1 >= instanceLimit) {
+    if (instanceLimit !== undefined && instances.size + 1 > instanceLimit) {
       throw new Error(`Anvil instance limit of ${instanceLimit} reached`);
     }
 
