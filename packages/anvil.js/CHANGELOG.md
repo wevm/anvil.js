@@ -1,5 +1,11 @@
 # @viem/anvil
 
+## 0.0.1
+
+### Patch Changes
+
+- [`e17192d`](https://github.com/wagmi-dev/anvil.js/commit/e17192d71ccb7176bfc3ba53a74b61ff46bbad92) Thanks [@fubhy](https://github.com/fubhy)! - Fix pool limit
+
 ## 0.0.6
 
 ### Patch Changes
