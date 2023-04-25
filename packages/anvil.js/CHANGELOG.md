@@ -1,4 +1,4 @@
-# @fubhy/anvil
+# @viem/anvil
 
 ## 0.0.6
 

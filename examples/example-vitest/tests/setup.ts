@@ -1,4 +1,4 @@
-import { fetchLogs } from "@fubhy/anvil";
+import { fetchLogs } from "@viem/anvil";
 import { afterAll, afterEach } from "vitest";
 import { pool, testClient } from "./utils.js";
 import { FORK_BLOCK_NUMBER, FORK_URL } from "./constants.js";

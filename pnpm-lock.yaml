@@ -1,7 +1,7 @@
 lockfileVersion: '6.0'
 
 overrides:
-  '@fubhy/anvil': workspace:*
+  '@viem/anvil': workspace:*
 
 importers:
 
@@ -26,9 +26,9 @@ importers:
         specifier: ^0.3.11
         version: 0.3.11(typescript@5.0.4)
     devDependencies:
-      '@fubhy/anvil':
+      '@viem/anvil':
         specifier: workspace:*
-        version: link:../../packages/anviljs
+        version: link:../../packages/anvil.js
       typescript:
         specifier: ^5.0.4
         version: 5.0.4
@@ -39,7 +39,7 @@ importers:
         specifier: ^0.30.1
         version: 0.30.1(@vitest/ui@0.30.1)
 
-  packages/anviljs:
+  packages/anvil.js:
     dependencies:
       execa:
         specifier: ^7.1.1

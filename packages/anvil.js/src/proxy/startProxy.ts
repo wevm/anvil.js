@@ -33,7 +33,7 @@ export type StartProxyOptions = {
  *
  * @example
  * ```
- * import { startProxy } from "@fubhy/anvil";
+ * import { startProxy } from "@viem/anvil";
  *
  * // Returns a function to shut down the proxy and all spawned anvil instances.
  * const shutdown = await startProxy({

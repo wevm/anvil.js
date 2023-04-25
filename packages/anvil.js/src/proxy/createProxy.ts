@@ -19,7 +19,7 @@ export type CreateProxyOptions = {
  *
  * @example
  * ```
- * import { createProxy, createPool } from "@fubhy/anvil";
+ * import { createProxy, createPool } from "@viem/anvil";
  *
  * const server = const createProxy({
  *   pool: createPool<number>(),

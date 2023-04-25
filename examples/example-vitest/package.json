@@ -10,7 +10,7 @@
     "viem": "^0.3.11"
   },
   "devDependencies": {
-    "@fubhy/anvil": "latest",
+    "@viem/anvil": "latest",
     "typescript": "^5.0.4",
     "vite": "^4.3.1",
     "vitest": "^0.30.1"

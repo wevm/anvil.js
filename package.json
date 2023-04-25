@@ -19,7 +19,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@fubhy/anvil": "workspace:*"
+      "@viem/anvil": "workspace:*"
     }
   }
 }

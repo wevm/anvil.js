@@ -1,10 +1,10 @@
 {
-  "name": "@fubhy/anvil",
+  "name": "@viem/anvil",
   "version": "0.0.6",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wagmi-dev/anviljs.git",
+    "url": "https://github.com/wagmi-dev/anvil.js.git",
     "directory": "packages/anvil"
   },
   "scripts": {

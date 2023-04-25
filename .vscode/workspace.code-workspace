@@ -6,7 +6,7 @@
     },
     {
       "name": "🦾 anvil",
-      "path": "../packages/anviljs"
+      "path": "../packages/anvil.js"
     },
     {
       "name": "👷 examples",

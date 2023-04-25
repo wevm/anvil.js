@@ -1,5 +1,5 @@
 ---
-"@fubhy/anvil": patch
+"@viem/anvil": patch
 ---
 
 Fix pool limit
