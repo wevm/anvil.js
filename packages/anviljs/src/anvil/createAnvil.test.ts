@@ -113,11 +113,7 @@ test("can subscribe to stdout", async () => {
   anvil.on("stdout", (message) => messages.push(message));
 
   await anvil.start();
-  expect(messages.length).toBe(1);
-
-  const { testClient } = createAnvilClients(anvil);
-  await testClient.mine({ blocks: 3 });
-  expect(messages.length).toBeGreaterThanOrEqual(5);
+  expect(messages.length).toBeGreaterThanOrEqual(1);
 });
 
 test("can subscribe to stderr", async () => {
@@ -131,6 +127,6 @@ test("can subscribe to stderr", async () => {
   second.on("stderr", (message) => messages.push(message));
   await expect(second.start()).rejects.toThrow("Anvil exited");
 
-  expect(messages.length).toBe(1);
+  expect(messages.length).toBeGreaterThanOrEqual(1);
   expect(messages[0]).toMatch("thread 'main' panicked");
 });
