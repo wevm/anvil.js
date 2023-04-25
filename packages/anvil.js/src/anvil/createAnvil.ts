@@ -2,6 +2,7 @@ import { execa, type ExecaChildProcess } from "execa";
 import { Writable } from "node:stream";
 import { EventEmitter } from "node:events";
 import { toArgs } from "./toArgs.js";
+import { stripColors } from "./stripColors.js";
 
 type Hardfork =
   | "Frontier"
@@ -236,9 +237,6 @@ export type CreateAnvilOptions = AnvilOptions & {
   stopTimeout?: number | undefined;
 };
 
-const colors =
-  /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
-
 export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
   const emitter = new EventEmitter();
   const logs: string[] = [];
@@ -265,7 +263,7 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
   const stdout = new Writable({
     write(chunk, _, callback) {
       try {
-        const message = (chunk.toString() as string).replace(colors, "");
+        const message = stripColors(chunk.toString());
         emitter.emit("message", message);
         emitter.emit("stdout", message);
         callback();
@@ -282,9 +280,7 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
   const stderr = new Writable({
     write(chunk, _, callback) {
       try {
-        const message = (chunk.toString() as string)
-          .replace(colors, "")
-          .replace("\n", "");
+        const message = stripColors(chunk.toString());
         emitter.emit("message", message);
         emitter.emit("stderr", message);
         callback();
