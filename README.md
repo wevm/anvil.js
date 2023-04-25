@@ -15,7 +15,7 @@ pnpm add @viem/anvil
 
 ## Overview
 
-AnvilJS provides a simple API to spawn and manage Anvil instances.
+AnvilJS provides a simple API to create and manage Anvil instances programmatically.
 
 ## API
 
