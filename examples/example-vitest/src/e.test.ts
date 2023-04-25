@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import { publicClient, testClient } from "../tests/utils.js";
 import { FORK_BLOCK_NUMBER } from "../tests/constants.js";
 
-test("playground", async () => {
+test("multi thread test example: e", async () => {
   await expect(publicClient.getBlock()).resolves.toMatchInlineSnapshot(`
     {
       "baseFeePerGas": 12779459001n,
