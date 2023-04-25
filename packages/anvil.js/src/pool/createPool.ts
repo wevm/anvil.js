@@ -8,7 +8,7 @@ import {
 // TODO: Don't be lazy. Create a proper type for this.
 export type Pool<TKey = number> = ReturnType<typeof createPool<TKey>>;
 
-export type PoolOptions = {
+export type CreatePoolOptions = {
   /**
    * Limits the number of instances that can be created.
    */
@@ -21,10 +21,13 @@ export type PoolOptions = {
   autoPort?: boolean | undefined;
 };
 
+/**
+ * Creates pool of anvil instances.
+ */
 export function createPool<TKey = number>({
   instanceLimit,
   autoPort = true,
-}: PoolOptions = {}) {
+}: CreatePoolOptions = {}) {
   const instances = new Map<TKey, Promise<Anvil>>();
 
   async function start(id: TKey, options?: CreateAnvilOptions) {

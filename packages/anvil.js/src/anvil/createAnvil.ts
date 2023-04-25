@@ -237,6 +237,9 @@ export type CreateAnvilOptions = AnvilOptions & {
   stopTimeout?: number | undefined;
 };
 
+/**
+ * Creates anvil instance.
+ */
 export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
   const emitter = new EventEmitter();
   const logs: string[] = [];

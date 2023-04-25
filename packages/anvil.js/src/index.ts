@@ -13,6 +13,12 @@ export {
 } from "./proxy/createProxy.js";
 
 export {
+  type CreatePoolOptions,
+  type Pool,
+  createPool,
+} from "./pool/createPool.js";
+
+export {
   type StartProxyOptions,
   startProxy,
 } from "./proxy/startProxy.js";
