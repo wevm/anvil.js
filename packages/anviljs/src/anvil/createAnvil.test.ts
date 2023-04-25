@@ -48,7 +48,7 @@ test("throws if anvil can't start due to port collision", async () => {
   const a = createAnvil({ port });
   const b = createAnvil({ port });
   await expect(a.start()).resolves.toBeUndefined();
-  await expect(b.start()).rejects.toThrow("Address already in use");
+  await expect(b.start()).rejects.toThrow("Anvil exited");
 });
 
 test("throws if trying to start the same instance multiple times", async () => {
@@ -129,7 +129,7 @@ test("can subscribe to stderr", async () => {
 
   const second = createAnvil({ port });
   second.on("stderr", (message) => messages.push(message));
-  await expect(second.start()).rejects.toThrow("Address already in use");
+  await expect(second.start()).rejects.toThrow("Anvil exited");
 
   expect(messages.length).toBe(1);
   expect(messages[0]).toMatch("thread 'main' panicked");
