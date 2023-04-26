@@ -33,11 +33,14 @@ Creates anvil instance.
 ```ts
 import { createAnvil } from "@viem/anvil"
 
-// All options are supported & typed.
 const anvil = createAnvil({
+  // All anvil options are supported & typed.
   forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
   blockNumber: 12345678,
 });
+
+await anvil.start();
+await anvil.stop();
 ```
 
 ### `getVersion`
@@ -90,8 +93,8 @@ Creates pool of anvil instances.
 
 | Name      | Description                       | Type                 |
 | --------- | --------------------------------- | -------------------- |
-| `options` | Options used to create pool.      | `CreatePoolOptions` |
-| returns   | Pool                              | `Pool`             |
+| `options` | Options used to create pool.      | `CreatePoolOptions`  |
+| returns   | Pool                              | `Pool`               |
 
 #### Usage
 
@@ -105,10 +108,10 @@ const pool = createPool();
 
 Creates and starts a proxy server that spawns an anvil instance for each request.
 
-| Name      | Description                                                      | Type                |
-| --------- | ---------------------------------------------------------------- | ------------------- |
-| `options` | Options used to spawn anvil instance.                            | `StartProxyOptions` |
-| returns   | Function to shut down the proxy and all spawned anvil instances. | `response.json()`   |
+| Name      | Description                                                      | Type                      |
+| --------- | ---------------------------------------------------------------- | ------------------------- |
+| `options` | Options used to spawn anvil instance.                            | `StartProxyOptions`       |
+| returns   | Function to shut down the proxy and all spawned anvil instances. | `() => Awaitable<void>`   |
 
 #### Usage
 
@@ -136,7 +139,7 @@ Fetches logs for anvil instances.
 | -------- | ----------------------- | ------------------- |
 | `url`    | URL to anvil proxy.     | `string`            |
 | `id`     | ID of test worker.      | `number`            |
-| returns  | Logs of anvil instance. | `response.json()`   |
+| returns  | Logs of anvil instance. | `string[]`          |
 
 #### Usage
 
