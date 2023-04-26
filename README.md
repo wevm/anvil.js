@@ -35,7 +35,7 @@ import { createAnvil } from "@viem/anvil"
 
 // All options are supported & typed.
 const anvil = createAnvil({
-  forkUrk: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
+  forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
   blockNumber: 12345678,
 });
 ```
@@ -74,7 +74,7 @@ import { createProxy, createPool } from "@viem/anvil";
 const server = const createProxy({
   pool: createPool<number>(),
   options: {
-    forkUrk: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
+    forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
     blockNumber: 12345678,
   },
 });
@@ -119,7 +119,7 @@ import { startProxy } from "@viem/anvil";
 const shutdown = await startProxy({
   port: 8555,
   options: {
-    forkUrk: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
+    forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
     blockNumber: 12345678,
   },
 });
