@@ -102,6 +102,14 @@ Creates pool of anvil instances.
 import { createPool } from "@viem/anvil";
 
 const pool = createPool();
+await pool.start(1, {
+  forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
+  blockNumber: 123,
+})
+await pool.start(2, {
+  forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
+  blockNumber: 456,
+})
 ```
 
 ### `startProxy`
