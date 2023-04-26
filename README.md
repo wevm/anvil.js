@@ -33,7 +33,11 @@ Creates anvil instance.
 ```ts
 import { createAnvil } from "@viem/anvil"
 
-const anvil = createAnvil();
+// All options are supported & typed.
+const anvil = createAnvil({
+  forkUrk: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
+  blockNumber: 12345678,
+});
 ```
 
 ### `getVersion`
@@ -74,7 +78,7 @@ const server = const createProxy({
     blockNumber: 12345678,
   },
 });
- *
+
 server.listen(8545, "::", () => {
   console.log("Proxy server listening on http://0.0.0.0:8545");
 });

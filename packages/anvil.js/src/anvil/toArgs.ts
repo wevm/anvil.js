@@ -1,5 +1,11 @@
 import { toFlagCase } from "./toFlagCase.js";
 
+/**
+ * Converts an object of options to an array of command line arguments.
+ *
+ * @param options The options object.
+ * @returns The command line arguments.
+ */
 export function toArgs(options: {
   [key: string]: string | boolean | number | bigint | undefined;
 }) {

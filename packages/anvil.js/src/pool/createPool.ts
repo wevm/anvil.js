@@ -5,8 +5,59 @@ import {
   type CreateAnvilOptions,
 } from "../anvil/createAnvil.js";
 
-// TODO: Don't be lazy. Create a proper type for this.
-export type Pool<TKey = number> = ReturnType<typeof createPool<TKey>>;
+/**
+ * A pool of anvil instances.
+ */
+export type Pool<TKey = number> = {
+  /**
+   * The number of instances in the pool.
+   */
+  readonly size: number;
+  /**
+   * Returns an iterator of all instances in the pool.
+   */
+  instances: () => IterableIterator<[TKey, Promise<Anvil>]>;
+  /**
+   * Returns true if the pool contains an instance with the given id.
+   *
+   * @param id The id of the instance.
+   * @returns True if the pool contains an instance with the given id.
+   */
+  has: (id: TKey) => boolean;
+  /**
+   * Returns the instance with the given id or undefined if it doesn't exist.
+   *
+   * @param id The id of the instance.
+   * @returns The instance with the given id or undefined if it doesn't exist.
+   */
+  get: (id: TKey) => Promise<Anvil> | undefined;
+  /**
+   * Starts an instance with the given id.
+   *
+   * @param id The id of the instance.
+   * @param options The options to pass to the instance.
+   * @returns A promise that resolves to the instance.
+   * @throws If an instance with the given id already exists.
+   * @throws If the instance limit has been reached.
+   */
+  start: (id: TKey, options?: CreateAnvilOptions) => Promise<Anvil>;
+  /**
+   * Stops the instance with the given id.
+   *
+   * @param id The id of the instance.
+   * @returns A promise that resolves when the instance has stopped.
+   * @throws If an instance with the given id already exists.
+   * @throws If the instance didn't stop gracefully.
+   */
+  stop: (id: TKey) => Promise<void>;
+  /**
+   * Stops all instances in the pool.
+   *
+   * @returns A promise that resolves when all instances have stopped.
+   * @throws If any instance didn't stop gracefully.
+   */
+  empty: () => Promise<void>;
+};
 
 export type CreatePoolOptions = {
   /**
@@ -27,7 +78,7 @@ export type CreatePoolOptions = {
 export function createPool<TKey = number>({
   instanceLimit,
   autoPort = true,
-}: CreatePoolOptions = {}) {
+}: CreatePoolOptions = {}): Pool<TKey> {
   const instances = new Map<TKey, Promise<Anvil>>();
 
   async function start(id: TKey, options?: CreateAnvilOptions) {
@@ -97,5 +148,5 @@ export function createPool<TKey = number>({
     start,
     stop,
     empty,
-  } as const;
+  };
 }

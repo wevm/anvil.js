@@ -10,12 +10,18 @@ export type AnvilProxyOptions =
   | ((id: number, request: IncomingMessage) => Awaitable<CreateAnvilOptions>);
 
 export type CreateProxyOptions = {
+  /**
+   * The pool of anvil instances.
+   */
   pool: Pool<number>;
+  /**
+   * The options to pass to each anvil instance.
+   */
   options?: AnvilProxyOptions | undefined;
 };
 
 /**
- * Creates a proxy server that spawns an anvil instance for each request.
+ * Creates a proxy server that spawns anvil instance on demand.
  *
  * @example
  * ```

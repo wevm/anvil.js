@@ -4,7 +4,7 @@ import { createPool, type Pool } from "../pool/createPool.js";
 
 export type StartProxyOptions = {
   /**
-   * The options to spawn new anvil instances with.
+   * The options to create new anvil instances with.
    *
    * Can be a function callback to dynamically derive the options based on the request
    * or instance id.
@@ -29,13 +29,13 @@ export type StartProxyOptions = {
 };
 
 /**
- * Creates and starts a proxy server that spawns an anvil instance for each request.
+ * Creates and starts a proxy server that spawns anvil instance on demand.
  *
  * @example
  * ```
  * import { startProxy } from "@viem/anvil";
  *
- * // Returns a function to shut down the proxy and all spawned anvil instances.
+ * // Returns a function to shut down the proxy and all created anvil instances.
  * const shutdown = await startProxy({
  *   port: 8555,
  *   options: {
@@ -44,7 +44,7 @@ export type StartProxyOptions = {
  *   },
  * });
  *
- * // Shut down the proxy and all spawned anvil instances.
+ * // Shut down the proxy and all created anvil instances.
  * await shutdown();
  * ```
  */

@@ -4,6 +4,60 @@ import { EventEmitter } from "node:events";
 import { toArgs } from "./toArgs.js";
 import { stripColors } from "./stripColors.js";
 
+/**
+ * An anvil instance.
+ */
+export type Anvil = {
+  /**
+   * Starts the anvil instance.
+   *
+   * @returns A promise that resolves when the instance has started.
+   * @throws If the instance didn't start gracefully.
+   */
+  start(): Promise<void>;
+  /**
+   * Stops the anvil instance.
+   *
+   * @returns A promise that resolves when the instance has stopped.
+   * @throws If the instance didn't stop gracefully.
+   */
+  stop(): Promise<void>;
+  /**
+   * Subscribe to events of the anvil instance.
+   *
+   * @param event The event to subscribe to.
+   * @param listener The listener to call when the event is emitted.
+   */
+  on(event: "message", listener: (message: string) => void): () => void;
+  on(event: "stderr", listener: (message: string) => void): () => void;
+  on(event: "stdout", listener: (message: string) => void): () => void;
+  on(event: "closed", listener: () => void): () => void;
+  on(
+    event: "exit",
+    listener: (code?: number, signal?: NodeJS.Signals) => void,
+  ): () => void;
+  /**
+   * The current status of the anvil instance.
+   */
+  readonly status: "idle" | "starting" | "stopping" | "listening";
+  /**
+   * The most recent logs of the anvil instance.
+   */
+  readonly logs: string[];
+  /**
+   * The port the anvil instance is configured to listen on.
+   */
+  readonly port: number;
+  /**
+   * The host the anvil instance is configured to listen on.
+   */
+  readonly host: string;
+  /**
+   * The options which the anvil instance was created with.
+   */
+  readonly options: CreateAnvilOptions;
+};
+
 type Hardfork =
   | "Frontier"
   | "Homestead"
@@ -445,21 +499,3 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
     },
   };
 }
-
-export type Anvil = {
-  start(): Promise<void>;
-  stop(): Promise<void>;
-  on(event: "message", listener: (message: string) => void): () => void;
-  on(event: "stderr", listener: (message: string) => void): () => void;
-  on(event: "stdout", listener: (message: string) => void): () => void;
-  on(event: "closed", listener: () => void): () => void;
-  on(
-    event: "exit",
-    listener: (code?: number, signal?: NodeJS.Signals) => void,
-  ): () => void;
-  readonly status: "idle" | "starting" | "stopping" | "listening";
-  readonly logs: string[];
-  readonly port: number;
-  readonly host: string;
-  readonly options: CreateAnvilOptions;
-};
