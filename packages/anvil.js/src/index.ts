@@ -8,6 +8,13 @@ export {
 export { getVersion } from "./anvil/getVersion.js";
 
 export {
+  type AnvilProxyOptions,
+  type AnvilProxyOptionsFn,
+  type ProxyRequestContext,
+  type ProxyRequestHandler,
+  type ProxyResponse,
+  type ProxyResponseFailure,
+  type ProxyResponseSuccess,
   type CreateProxyOptions,
   createProxy,
 } from "./proxy/createProxy.js";

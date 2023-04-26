@@ -165,12 +165,19 @@ console.log(...logs.slice(-20));
 import type {
   Anvil,
   AnvilOptions,
+  AnvilProxyOptions,
+  AnvilProxyOptionsFn,
   CreateAnvilOptions,
   CreateProxyOptions,
   CreatePoolOptions,
   Pool,
+  ProxyRequestContext,
+  ProxyRequestHandler,
+  ProxyResponse,
+  ProxyResponseFailure,
+  ProxyResponseSuccess,
   StartProxyOptions,
-} from "@viem/anvil"
+} from "@viem/anvil";
 ```
 
 ## Contributing
