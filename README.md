@@ -62,7 +62,7 @@ const version = getVersion();
 
 ### `createProxy`
 
-Creates a proxy server that spawns an anvil instance for each request.
+Creates and starts a proxy server that spawns anvil instance on demand (e.g. per test file or per test case).
 
 | Name      | Description                            | Type                 |
 | --------- | -------------------------------------- | -------------------- |
@@ -114,7 +114,7 @@ await pool.start(2, {
 
 ### `startProxy`
 
-Creates and starts a proxy server that spawns an anvil instance for each request.
+Creates and starts a proxy server that spawns anvil instance on demand (e.g. per test file or per test case).
 
 | Name      | Description                                                      | Type                      |
 | --------- | ---------------------------------------------------------------- | ------------------------- |
