@@ -31,7 +31,7 @@ Creates anvil instance.
 #### Usage
 
 ```ts
-import { createAnvil } from "@viem/anvil"
+import { createAnvil } from "@viem/anvil";
 
 const anvil = createAnvil({
   // All anvil options are supported & typed.
@@ -55,7 +55,7 @@ Get `anvil` version.
 #### Usage
 
 ```ts
-import { getVersion } from "@viem/anvil"
+import { getVersion } from "@viem/anvil";
 
 const version = getVersion();
 ```
