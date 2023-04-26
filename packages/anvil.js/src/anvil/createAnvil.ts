@@ -358,7 +358,7 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
 
     status = "starting";
 
-    // rome-ignore lint/suspicious/noAsyncPromiseExecutor: <explanation>
+    // rome-ignore lint/suspicious/noAsyncPromiseExecutor: this is fine ...
     return new Promise<void>(async (resolve, reject) => {
       let log: string | undefined = undefined;
 
@@ -433,9 +433,9 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
         emitter.emit("exit", code ?? undefined, signal ?? undefined);
       });
 
-      // rome-ignore lint/style/noNonNullAssertion: <explanation>
+      // rome-ignore lint/style/noNonNullAssertion: this is guaranteed to be defined
       anvil.pipeStdout!(stdout);
-      // rome-ignore lint/style/noNonNullAssertion: <explanation>
+      // rome-ignore lint/style/noNonNullAssertion: this is guaranteed to be defined
       anvil.pipeStderr!(stderr);
     });
   }
@@ -473,7 +473,7 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
   return {
     start,
     stop,
-    // rome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // rome-ignore lint/suspicious/noExplicitAny: typed via the return type
     on: (event: string, listener: any) => {
       emitter.on(event, listener);
 

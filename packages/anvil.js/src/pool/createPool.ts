@@ -46,7 +46,6 @@ export type Pool<TKey = number> = {
    *
    * @param id The id of the instance.
    * @returns A promise that resolves when the instance has stopped.
-   * @throws If an instance with the given id already exists.
    * @throws If the instance didn't stop gracefully.
    */
   stop: (id: TKey) => Promise<void>;
@@ -90,7 +89,7 @@ export function createPool<TKey = number>({
       throw new Error(`Anvil instance limit of ${instanceLimit} reached`);
     }
 
-    // rome-ignore lint/suspicious/noAsyncPromiseExecutor: <explanation>
+    // rome-ignore lint/suspicious/noAsyncPromiseExecutor: this is fine ...
     const anvil = new Promise<Anvil>(async (resolve, reject) => {
       try {
         const opts = {
@@ -118,9 +117,8 @@ export function createPool<TKey = number>({
 
   async function stop(id: TKey) {
     const anvil = instances.get(id);
-
     if (anvil === undefined) {
-      throw new Error(`Anvil instance with id "${id}" doesn't exist`);
+      return;
     }
 
     instances.delete(id);
