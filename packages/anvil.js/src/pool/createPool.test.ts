@@ -2,7 +2,7 @@ import { expect, test, afterEach, beforeEach } from "vitest";
 import { createPool, type Pool } from "./createPool.js";
 import { createAnvilClients } from "../../tests/utils/utils.js";
 
-let pool: Pool<number>;
+let pool: Pool;
 beforeEach(() => {
   pool = createPool();
 });
@@ -74,12 +74,10 @@ test("can close instances", async () => {
   expect(pool.has(3)).toBe(false);
 });
 
-test("throws when trying to close an instance that doesn't exist", async () => {
+test("doesn't throw when trying to close an instance that doesn't exist", async () => {
   await pool.start(1);
   await expect(pool.stop(1)).resolves.toBe(undefined);
-  await expect(pool.stop(2)).rejects.toThrowErrorMatchingInlineSnapshot(
-    '"Anvil instance with id \\"2\\" doesn\'t exist"',
-  );
+  await expect(pool.stop(2)).resolves.toBe(undefined);
 });
 
 test("can use the same ids after closing instances", async () => {

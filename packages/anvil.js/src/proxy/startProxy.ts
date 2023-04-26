@@ -13,7 +13,7 @@ export type StartProxyOptions = {
   /**
    * The anvil instance manager.
    */
-  pool?: Pool<number> | undefined;
+  pool?: Pool | undefined;
   /**
    * The hostname to listen on.
    *
@@ -51,7 +51,7 @@ export type StartProxyOptions = {
 export async function startProxy({
   port = 8545,
   host = "::",
-  pool = createPool<number>(),
+  pool = createPool(),
   options,
 }: StartProxyOptions = {}) {
   // rome-ignore lint/suspicious/noAsyncPromiseExecutor: this is fine ...

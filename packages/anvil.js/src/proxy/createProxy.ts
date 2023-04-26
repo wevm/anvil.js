@@ -1,23 +1,59 @@
 import httpProxy from "http-proxy";
-import { IncomingMessage, createServer } from "node:http";
-import { parseRequest } from "./parseRequest.js";
+import { IncomingMessage, ServerResponse, createServer } from "node:http";
+import { parseRequest, type InstanceRequestContext } from "./parseRequest.js";
 import { type Pool } from "../pool/createPool.js";
 import type { Awaitable } from "vitest";
 import type { CreateAnvilOptions } from "../anvil/createAnvil.js";
 
-export type AnvilProxyOptions =
-  | CreateAnvilOptions
-  | ((id: number, request: IncomingMessage) => Awaitable<CreateAnvilOptions>);
+// rome-ignore lint/nursery/noBannedTypes: this is fine ...
+export type ProxyResponseSuccess<TResponse extends object = {}> = {
+  success: true;
+} & TResponse;
+
+export type ProxyResponseFailure = {
+  success: false;
+  reason: string;
+};
+
+export type ProxyResponse<TResponse extends object> =
+  | ProxyResponseSuccess<TResponse>
+  | ProxyResponseFailure;
+
+export type ProxyRequestHandler = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  context: ProxyRequestContext,
+) => Awaitable<void>;
+
+export type ProxyRequestContext = {
+  pool: Pool;
+  options?: AnvilProxyOptions | undefined;
+  // rome-ignore lint/nursery/noBannedTypes: this is fine ...
+} & (InstanceRequestContext | {});
+
+/**
+ * A function callback to dynamically derive the options based on the request.
+ */
+export type AnvilProxyOptionsFn = (
+  id: number,
+  request: IncomingMessage,
+) => Awaitable<CreateAnvilOptions>;
+
+export type AnvilProxyOptions = CreateAnvilOptions | AnvilProxyOptionsFn;
 
 export type CreateProxyOptions = {
   /**
    * The pool of anvil instances.
    */
-  pool: Pool<number>;
+  pool: Pool;
   /**
    * The options to pass to each anvil instance.
    */
   options?: AnvilProxyOptions | undefined;
+  /**
+   * A function callback to handle custom proxy requests.
+   */
+  fallback?: ProxyRequestHandler | undefined;
 };
 
 /**
@@ -28,7 +64,7 @@ export type CreateProxyOptions = {
  * import { createProxy, createPool } from "@viem/anvil";
  *
  * const server = const createProxy({
- *   pool: createPool<number>(),
+ *   pool: createPool(),
  *   options: {
  *     forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
  *     blockNumber: 12345678,
@@ -40,69 +76,150 @@ export type CreateProxyOptions = {
  * });
  * ```
  */
-export function createProxy({ pool, options }: CreateProxyOptions) {
+export function createProxy({ pool, options, fallback }: CreateProxyOptions) {
   const proxy = httpProxy.createProxyServer({
     ignorePath: true,
     ws: true,
   });
 
   const server = createServer(async (req, res) => {
-    const { id, path } = parseRequest(req.url);
+    try {
+      const context = parseRequest(req.url);
 
-    if (id === undefined) {
-      res.writeHead(404).end("Missing instance id in request");
-    } else if (path === "/logs") {
-      const anvil = await pool.get(id);
+      if (context !== undefined) {
+        switch (context.path) {
+          case "/": {
+            const anvil =
+              (await pool.get(context.id)) ??
+              (await pool.start(
+                context.id,
+                typeof options === "function"
+                  ? await options(context.id, req)
+                  : options,
+              ));
 
-      if (anvil !== undefined) {
-        const output = JSON.stringify((await anvil.logs) ?? []);
-        res.writeHead(200).end(output);
-      } else {
-        res.writeHead(404).end(`Anvil instance doesn't exists.`);
+            return proxy.web(req, res, {
+              target: `http://${anvil.host}:${anvil.port}`,
+            });
+          }
+
+          case "/start": {
+            if (pool.has(context.id)) {
+              return sendFailure(res, {
+                code: 404,
+                reason: "Anvil instance already exists",
+              });
+            }
+
+            await pool.start(
+              context.id,
+              typeof options === "function"
+                ? await options(context.id, req)
+                : options,
+            );
+
+            return sendSuccess(res);
+          }
+
+          case "/stop": {
+            const success = await pool
+              .stop(context.id)
+              .then(() => true)
+              .catch(() => false);
+
+            return sendResponse(res, 200, { success });
+          }
+
+          case "/logs": {
+            const anvil = await pool.get(context.id);
+
+            if (anvil !== undefined) {
+              const logs = (await anvil.logs) ?? [];
+              return sendSuccess(res, { logs });
+            }
+
+            return sendFailure(res, {
+              code: 404,
+              reason: `Anvil instance doesn't exists`,
+            });
+          }
+        }
       }
-    } else if (path === "/shutdown") {
-      if (pool.has(id)) {
-        const output = JSON.stringify({ success: await pool.stop(id) });
-        res.writeHead(200).end(output);
-      } else {
-        res.writeHead(404).end(`Anvil instance doesn't exists.`);
-      }
-    } else if (path === "/") {
-      const anvil =
-        (await pool.get(id)) ??
-        (await pool.start(
-          id,
-          typeof options === "function" ? await options(id, req) : options,
-        ));
 
-      proxy.web(req, res, {
-        target: `http://${anvil.host}:${anvil.port}`,
+      if (fallback !== undefined) {
+        return await fallback(req, res, { ...context, pool, options });
+      }
+
+      return sendFailure(res, {
+        code: 404,
+        reason: "Unsupported request",
       });
-    } else {
-      res.writeHead(404).end("Invalid request");
+    } catch (error) {
+      console.error(error);
+
+      return sendFailure(res, {
+        code: 500,
+        reason: "Internal server error",
+      });
     }
   });
 
   server.on("upgrade", async (req, socket, head) => {
-    const { id, path } = parseRequest(req.url);
+    const context = parseRequest(req.url);
 
-    if (id === undefined) {
-      socket.destroy(new Error("Anvil instance doesn't exists."));
-    } else if (path === "/") {
+    if (context?.path === "/") {
       const anvil =
-        (await pool.get(id)) ??
+        (await pool.get(context.id)) ??
         (await pool.start(
-          id,
-          typeof options === "function" ? await options(id, req) : options,
+          context.id,
+          typeof options === "function"
+            ? await options(context.id, req)
+            : options,
         ));
 
       proxy.ws(req, socket, head, {
         target: `ws://${anvil.host}:${anvil.port}`,
       });
     } else {
-      socket.destroy(new Error("Invalid request"));
+      socket.destroy(new Error("Unsupported request"));
     }
   });
 
   return server;
+}
+
+function sendFailure(
+  res: ServerResponse,
+  {
+    reason = "Unsupported request",
+    code = 400,
+  }: { reason?: string; code?: number } = {},
+) {
+  sendResponse(res, code, {
+    reason,
+    success: false,
+  });
+}
+
+function sendSuccess(
+  res: ServerResponse,
+  output?: { success?: never; [key: string]: unknown },
+) {
+  sendResponse(res, 200, {
+    ...output,
+    success: true,
+  });
+}
+
+function sendResponse(
+  res: ServerResponse,
+  code = 200,
+  output?: { success?: boolean; [key: string]: unknown },
+) {
+  const json = JSON.stringify({
+    ...output,
+    success: output?.success ?? code === 200,
+  });
+
+  res.writeHead(200).end(json);
 }
