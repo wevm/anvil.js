@@ -39,7 +39,7 @@ export type StartProxyOptions = {
  * const shutdown = await startProxy({
  *   port: 8555,
  *   options: {
- *     forkUrk: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
+ *     forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
  *     blockNumber: 12345678,
  *   },
  * });
