@@ -75,7 +75,7 @@ Creates a proxy server that spawns an anvil instance for each request.
 import { createProxy, createPool } from "@viem/anvil";
 
 const server = const createProxy({
-  pool: createPool<number>(),
+  pool: createPool(),
   options: {
     forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
     blockNumber: 12345678,
