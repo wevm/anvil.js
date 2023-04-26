@@ -1,15 +1,8 @@
 import { Server } from "node:http";
-import { createProxy, type AnvilProxyOptions } from "./createProxy.js";
+import { createProxy, type CreateProxyOptions } from "./createProxy.js";
 import { createPool, type Pool } from "../pool/createPool.js";
 
-export type StartProxyOptions = {
-  /**
-   * The options to create new anvil instances with.
-   *
-   * Can be a function callback to dynamically derive the options based on the request
-   * or instance id.
-   */
-  options?: AnvilProxyOptions | undefined;
+export type StartProxyOptions = Omit<CreateProxyOptions, "pool"> & {
   /**
    * The anvil instance manager.
    */
@@ -52,14 +45,11 @@ export async function startProxy({
   port = 8545,
   host = "::",
   pool = createPool(),
-  options,
+  ...rest
 }: StartProxyOptions = {}) {
   // rome-ignore lint/suspicious/noAsyncPromiseExecutor: this is fine ...
   const server = await new Promise<Server>(async (resolve, reject) => {
-    const server = createProxy({
-      pool,
-      options,
-    });
+    const server = createProxy({ pool, ...rest });
 
     server.on("listening", () => resolve(server));
     server.on("error", (error) => reject(error));

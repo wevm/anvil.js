@@ -1,15 +1,16 @@
-import { expect, test, afterEach, beforeEach } from "vitest";
+import { expect, test, beforeEach } from "vitest";
 import { createPool, type Pool } from "./createPool.js";
 import { createAnvilClients } from "../../tests/utils/utils.js";
 
 let pool: Pool;
+
 beforeEach(() => {
   pool = createPool();
-});
 
-afterEach(async () => {
-  const instances = Array.from(pool.instances());
-  await Promise.allSettled(instances.map(([id]) => pool.stop(id)));
+  return async () => {
+    const instances = Array.from(pool.instances());
+    await Promise.allSettled(instances.map(([id]) => pool.stop(id)));
+  };
 });
 
 test("should create instances with different ids", async () => {

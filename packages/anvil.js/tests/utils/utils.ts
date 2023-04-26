@@ -18,22 +18,25 @@ export type Tuple<T, N extends number> = N extends N
     : TupleOf<T, N, []>
   : never;
 
-export function createProxyClients<TIds extends readonly number[]>(ids: TIds) {
+export function createProxyClients<const TIds extends readonly number[]>(
+  ids: TIds,
+  port = 8545,
+) {
   const output = ids.map((i) => {
     const publicClient = createPublicClient({
       chain: anvil,
-      transport: http(`http://127.0.0.1:8545/${i}`),
+      transport: http(`http://127.0.0.1:${port}/${i}`),
     });
 
     const testClient = createTestClient({
       chain: anvil,
       mode: "anvil",
-      transport: http(`http://127.0.0.1:8545/${i}`),
+      transport: http(`http://127.0.0.1:${port}/${i}`),
     });
 
     const walletClient = createWalletClient({
       chain: anvil,
-      transport: http(`http://127.0.0.1:8545/${i}`),
+      transport: http(`http://127.0.0.1:${port}/${i}`),
     });
 
     return { publicClient, testClient, walletClient } as const;

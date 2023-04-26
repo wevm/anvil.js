@@ -8,6 +8,7 @@ import {
 } from "./createAnvil.js";
 
 const instances: Anvil[] = [];
+
 afterEach(async () => {
   vi.useRealTimers();
   const anvils = instances.splice(0, instances.length);

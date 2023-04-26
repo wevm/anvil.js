@@ -2,7 +2,7 @@ import { afterAll, expect, test } from "vitest";
 import { createProxyClients } from "./utils/utils.js";
 import { FORK_BLOCK_NUMBER, FORK_URL } from "./utils/constants.js";
 
-const clients = createProxyClients([1, 2, 3] as const);
+const clients = createProxyClients([1, 2, 3]);
 
 afterAll(async () => {
   await Promise.all(
