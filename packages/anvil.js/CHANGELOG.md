@@ -1,5 +1,13 @@
 # @viem/anvil
 
+## 0.0.3
+
+### Patch Changes
+
+- [#14](https://github.com/wagmi-dev/anvil.js/pull/14) [`c617901`](https://github.com/wagmi-dev/anvil.js/commit/c617901751bd112355259ba65befaee2ceadf0d4) Thanks [@fubhy](https://github.com/fubhy)! - Added support for custom fallback routes.
+
+- [`27c20e5`](https://github.com/wagmi-dev/anvil.js/commit/27c20e5640ea27dad49a786ed5ab5415d0862729) Thanks [@fubhy](https://github.com/fubhy)! - Added type exports
+
 ## 0.0.2
 
 ### Patch Changes
