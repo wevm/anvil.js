@@ -140,7 +140,7 @@ export function createProxy({ pool, options, fallback }: CreateProxyOptions) {
 
             return sendFailure(res, {
               code: 404,
-              reason: `Anvil instance doesn't exists`,
+              reason: `Anvil instance doesn't exist`,
             });
           }
         }
