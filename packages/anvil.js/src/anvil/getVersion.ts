@@ -1,4 +1,4 @@
-import { execaSync } from "execa";
+const { execaSync } = await import("execa");
 
 /**
  * Get anvil version

@@ -1,8 +1,10 @@
-import { execa, type ExecaChildProcess } from "execa";
+import type { ExecaChildProcess } from "execa";
 import { Writable } from "node:stream";
 import { EventEmitter } from "node:events";
 import { toArgs } from "./toArgs.js";
 import { stripColors } from "./stripColors.js";
+
+const { execa } = await import("execa");
 
 /**
  * An anvil instance.
