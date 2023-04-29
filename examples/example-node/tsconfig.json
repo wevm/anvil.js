@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["**/*.ts"],
+  "exclude": [],
+  "compilerOptions": {
+    "types": ["node"],
+    "moduleResolution": "Node",
+    "module": "CommonJS",
+    "verbatimModuleSyntax": false,
+    "esModuleInterop": true
+  }
+}
