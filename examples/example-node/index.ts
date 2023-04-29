@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { test } from "node:test";
-import { createAnvil, getVersion } from "@viem/anvil";
+import { createAnvil, createPool, getVersion, startProxy } from "@viem/anvil";
 
 test("can fetch the anvil version", async () => {
   const version = await getVersion();
@@ -20,4 +20,27 @@ test("can start and stop anvil instances", async () => {
   assert(anvil.status === "listening");
   await anvil.stop();
   assert((anvil.status as string) === "idle");
+});
+
+test("can start and stop pool instances", async () => {
+  const pool = createPool();
+
+  const a = await pool.start(1);
+  assert(a !== undefined);
+  assert(a.status === "listening");
+
+  const b = await pool.start(123);
+  assert(b !== undefined);
+  assert(b.status === "listening");
+
+  await a.stop();
+  assert((a.status as string) === "idle");
+
+  await b.stop();
+  assert((b.status as string) === "idle");
+});
+
+test("can start and stop an anvil proxy", async () => {
+  const stop = await startProxy();
+  await stop();
 });

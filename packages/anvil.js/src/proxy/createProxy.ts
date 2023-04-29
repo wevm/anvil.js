@@ -1,4 +1,4 @@
-import httpProxy from "http-proxy";
+import { createProxyServer } from "http-proxy";
 import { IncomingMessage, ServerResponse, createServer } from "node:http";
 import { parseRequest, type InstanceRequestContext } from "./parseRequest.js";
 import { type Pool } from "../pool/createPool.js";
@@ -77,7 +77,7 @@ export type CreateProxyOptions = {
  * ```
  */
 export function createProxy({ pool, options, fallback }: CreateProxyOptions) {
-  const proxy = httpProxy.createProxyServer({
+  const proxy = createProxyServer({
     ignorePath: true,
     ws: true,
   });
