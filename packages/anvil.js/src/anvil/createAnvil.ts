@@ -1,4 +1,4 @@
-import { execa, type ExecaChildProcess } from "execa";
+import type { ExecaChildProcess } from "execa";
 import { Writable } from "node:stream";
 import { EventEmitter } from "node:events";
 import { toArgs } from "./toArgs.js";
@@ -423,6 +423,8 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
       }, startTimeout);
 
       controller = new AbortController();
+
+      const { execa } = await import("execa");
       anvil = execa(anvilBinary, toArgs(anvilOptions), {
         signal: controller.signal,
         cleanup: true,

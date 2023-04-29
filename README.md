@@ -57,7 +57,7 @@ Get `anvil` version.
 ```ts
 import { getVersion } from "@viem/anvil";
 
-const version = getVersion();
+const version = await getVersion();
 ```
 
 ### `createProxy`
