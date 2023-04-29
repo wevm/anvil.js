@@ -4,8 +4,6 @@ import { EventEmitter } from "node:events";
 import { toArgs } from "./toArgs.js";
 import { stripColors } from "./stripColors.js";
 
-const { execa } = await import("execa");
-
 /**
  * An anvil instance.
  */
@@ -425,6 +423,8 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
       }, startTimeout);
 
       controller = new AbortController();
+
+      const { execa } = await import("execa");
       anvil = execa(anvilBinary, toArgs(anvilOptions), {
         signal: controller.signal,
         cleanup: true,
