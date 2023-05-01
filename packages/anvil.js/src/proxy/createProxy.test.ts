@@ -1,7 +1,7 @@
-import getPort from "get-port";
-import { test, expect, afterEach } from "vitest";
 import { createProxyClients } from "../../tests/utils/utils.js";
-import { startProxy, type StartProxyOptions } from "./startProxy.js";
+import { type StartProxyOptions, startProxy } from "./startProxy.js";
+import getPort from "get-port";
+import { afterEach, expect, test } from "vitest";
 
 const cleanup: (() => Promise<void>)[] = [];
 

@@ -1,8 +1,8 @@
-import type { ExecaChildProcess } from "execa";
-import { Writable } from "node:stream";
-import { EventEmitter } from "node:events";
-import { toArgs } from "./toArgs.js";
 import { stripColors } from "./stripColors.js";
+import { toArgs } from "./toArgs.js";
+import type { ExecaChildProcess } from "execa";
+import { EventEmitter } from "node:events";
+import { Writable } from "node:stream";
 
 /**
  * An anvil instance.

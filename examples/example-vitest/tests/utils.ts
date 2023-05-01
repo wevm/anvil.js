@@ -1,11 +1,11 @@
-import { mainnet } from "viem/chains";
 import {
-  createTestClient,
-  createPublicClient,
   type Chain,
-  http,
+  createPublicClient,
+  createTestClient,
   createWalletClient,
+  http,
 } from "viem";
+import { mainnet } from "viem/chains";
 
 /**
  * The id of the current test worker.

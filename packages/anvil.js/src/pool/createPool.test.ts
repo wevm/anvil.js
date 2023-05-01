@@ -1,6 +1,6 @@
-import { expect, test, beforeEach } from "vitest";
-import { createPool, type Pool } from "./createPool.js";
 import { createAnvilClients } from "../../tests/utils/utils.js";
+import { type Pool, createPool } from "./createPool.js";
+import { beforeEach, expect, test } from "vitest";
 
 let pool: Pool;
 

@@ -1,5 +1,5 @@
-import { expect, test } from "vitest";
 import { toArgs } from "./toArgs.js";
+import { expect, test } from "vitest";
 
 test.each([
   [{}, []],

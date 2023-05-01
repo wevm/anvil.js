@@ -1,6 +1,6 @@
-import { expect, test } from "vitest";
-import { publicClient } from "../tests/utils.js";
 import { FORK_BLOCK_NUMBER } from "../tests/constants.js";
+import { publicClient } from "../tests/utils.js";
+import { expect, test } from "vitest";
 
 test("vitest runs this test in parallel to the other", async () => {
   // NOTE: This test is run concurrently with the `wagmiContract` test file.

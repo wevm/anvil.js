@@ -1,9 +1,9 @@
-import getPort from "get-port";
 import {
-  createAnvil,
   type Anvil,
   type CreateAnvilOptions,
+  createAnvil,
 } from "../anvil/createAnvil.js";
+import getPort from "get-port";
 
 /**
  * A pool of anvil instances.
