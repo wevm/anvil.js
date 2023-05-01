@@ -1,5 +1,11 @@
 # @viem/anvil
 
+## 0.0.5
+
+### Patch Changes
+
+- [#24](https://github.com/wagmi-dev/anvil.js/pull/24) [`c6d71a3`](https://github.com/wagmi-dev/anvil.js/commit/c6d71a376fe49e53c3c7830836adbee7fd160489) Thanks [@fubhy](https://github.com/fubhy)! - Fixed `http-proxy` import for both cjs & esm
+
 ## 0.0.4
 
 ### Patch Changes
