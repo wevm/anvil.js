@@ -1,7 +1,7 @@
 import type { CreateAnvilOptions } from "../anvil/createAnvil.js";
 import { type Pool } from "../pool/createPool.js";
 import { type InstanceRequestContext, parseRequest } from "./parseRequest.js";
-import { createProxyServer } from "http-proxy";
+import httpProxy from "http-proxy";
 import { IncomingMessage, ServerResponse, createServer } from "node:http";
 import type { Awaitable } from "vitest";
 
@@ -63,7 +63,7 @@ export type CreateProxyOptions = {
  * ```
  * import { createProxy, createPool } from "@viem/anvil";
  *
- * const server = const createProxy({
+ * const server = createProxy({
  *   pool: createPool(),
  *   options: {
  *     forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
@@ -76,8 +76,21 @@ export type CreateProxyOptions = {
  * });
  * ```
  */
-export function createProxy({ pool, options, fallback }: CreateProxyOptions) {
-  const proxy = createProxyServer({
+export async function createProxy({
+  pool,
+  options,
+  fallback,
+}: CreateProxyOptions) {
+  let httpProxyWithCjsFallback: typeof httpProxy = httpProxy;
+
+  if (httpProxyWithCjsFallback === undefined) {
+    httpProxyWithCjsFallback = await import("http-proxy").then(
+      // rome-ignore lint/suspicious/noExplicitAny: required to support both esm & cjs.
+      (module) => (module as any).default,
+    );
+  }
+
+  const proxy = await httpProxyWithCjsFallback.createProxyServer({
     ignorePath: true,
     ws: true,
   });

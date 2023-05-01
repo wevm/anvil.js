@@ -49,7 +49,7 @@ export async function startProxy({
 }: StartProxyOptions = {}) {
   // rome-ignore lint/suspicious/noAsyncPromiseExecutor: this is fine ...
   const server = await new Promise<Server>(async (resolve, reject) => {
-    const server = createProxy({ pool, ...rest });
+    const server = await createProxy({ pool, ...rest });
 
     server.on("listening", () => resolve(server));
     server.on("error", (error) => reject(error));
