@@ -1,7 +1,7 @@
+import { FORK_BLOCK_NUMBER, FORK_URL } from "./constants.js";
+import { pool, testClient } from "./utils.js";
 import { fetchLogs } from "@viem/anvil";
 import { afterAll, afterEach } from "vitest";
-import { pool, testClient } from "./utils.js";
-import { FORK_BLOCK_NUMBER, FORK_URL } from "./constants.js";
 
 afterAll(async () => {
   // If you are using a fork, you can reset your anvil instance to the initial fork block.

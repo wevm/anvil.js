@@ -1,5 +1,5 @@
-import { expect, test } from "vitest";
 import { toFlagCase } from "./toFlagCase.js";
+import { expect, test } from "vitest";
 
 test.each([
   ["foo", "--foo"],

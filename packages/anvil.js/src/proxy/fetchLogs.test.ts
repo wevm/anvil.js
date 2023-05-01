@@ -1,8 +1,8 @@
-import { beforeAll, afterEach, expect, test } from "vitest";
-import { startProxy } from "./startProxy.js";
-import getPort from "get-port";
 import { createPool } from "../pool/createPool.js";
 import { fetchLogs } from "./fetchLogs.js";
+import { startProxy } from "./startProxy.js";
+import getPort from "get-port";
+import { afterEach, beforeAll, expect, test } from "vitest";
 
 const pool = createPool();
 afterEach(async () => {

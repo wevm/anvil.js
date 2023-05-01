@@ -1,12 +1,12 @@
+import type { Anvil } from "../../src/anvil/createAnvil.js";
 import {
-  createTestClient,
-  createPublicClient,
   type Chain,
-  http,
+  createPublicClient,
+  createTestClient,
   createWalletClient,
+  http,
 } from "viem";
 import { localhost } from "viem/chains";
-import type { Anvil } from "../../src/anvil/createAnvil.js";
 
 type TupleOf<T, N extends number, R extends unknown[]> = R["length"] extends N
   ? R

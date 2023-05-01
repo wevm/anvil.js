@@ -1,5 +1,5 @@
-import { test, expect } from "vitest";
 import { getVersion } from "./getVersion.js";
+import { expect, test } from "vitest";
 
 test("returns a valid version string", async () => {
   const version = await getVersion();

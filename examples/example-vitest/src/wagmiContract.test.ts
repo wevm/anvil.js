@@ -1,8 +1,8 @@
-import { beforeAll, expect, test } from "vitest";
+import { ALICE, BOB } from "../tests/constants.js";
 import { publicClient, walletClient } from "../tests/utils.js";
 import { wagmiContract } from "./wagmiContract.js";
-import { ALICE, BOB } from "../tests/constants.js";
-import { isAddress, type Address } from "viem";
+import { type Address, isAddress } from "viem";
+import { beforeAll, expect, test } from "vitest";
 
 let wagmi: Address;
 beforeAll(async () => {

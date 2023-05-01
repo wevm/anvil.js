@@ -1,5 +1,5 @@
-import { expect, test } from "vitest";
 import { parseRequest } from "./parseRequest.js";
+import { expect, test } from "vitest";
 
 test.each([
   ["", undefined],

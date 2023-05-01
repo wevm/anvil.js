@@ -1,6 +1,6 @@
+import { createAnvil, createPool, getVersion, startProxy } from "@viem/anvil";
 import assert from "node:assert";
 import { test } from "node:test";
-import { createAnvil, createPool, getVersion, startProxy } from "@viem/anvil";
 
 test("can fetch the anvil version", async () => {
   const version = await getVersion();

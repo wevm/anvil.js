@@ -1,6 +1,6 @@
+import { type Pool, createPool } from "../pool/createPool.js";
+import { type CreateProxyOptions, createProxy } from "./createProxy.js";
 import { Server } from "node:http";
-import { createProxy, type CreateProxyOptions } from "./createProxy.js";
-import { createPool, type Pool } from "../pool/createPool.js";
 
 export type StartProxyOptions = Omit<CreateProxyOptions, "pool"> & {
   /**

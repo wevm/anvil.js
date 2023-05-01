@@ -1,9 +1,9 @@
+import type { CreateAnvilOptions } from "../anvil/createAnvil.js";
+import { type Pool } from "../pool/createPool.js";
+import { type InstanceRequestContext, parseRequest } from "./parseRequest.js";
 import { createProxyServer } from "http-proxy";
 import { IncomingMessage, ServerResponse, createServer } from "node:http";
-import { parseRequest, type InstanceRequestContext } from "./parseRequest.js";
-import { type Pool } from "../pool/createPool.js";
 import type { Awaitable } from "vitest";
-import type { CreateAnvilOptions } from "../anvil/createAnvil.js";
 
 // rome-ignore lint/nursery/noBannedTypes: this is fine ...
 export type ProxyResponseSuccess<TResponse extends object = {}> = {
