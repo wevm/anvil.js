@@ -1,21 +1,35 @@
 # AnvilJS
 
-TypeScript wrapper for Foundry [Anvil](https://github.com/foundry-rs/foundry/tree/master/anvil).
+TypeScript wrapper for Foundry [Anvil](https://github.com/foundry-rs/foundry/tree/master/anvil). AnvilJS provides a simple API to create and manage Anvil instances programmatically.
+
+```ts
+import { createAnvil } from "@viem/anvil";
+
+const anvil = createAnvil({
+  forkUrl: "https://eth-mainnet.alchemyapi.io/v2/<API_KEY>",
+  blockNumber: 12345678,
+});
+
+await anvil.start();
+await anvil.stop();
+```
 
 ## Install
 
 ```bash
-npm i @viem/anvil
-yarn add @viem/anvil
 pnpm add @viem/anvil
+```
+
+```bash
+npm i @viem/anvil
+```
+
+```bash
+yarn add @viem/anvil
 ```
 
 > **Note**
 > Anvil is required to use `@viem/anvil`. Please refer to the [foundry book](https://book.getfoundry.sh) for Anvil [installation instructions](https://book.getfoundry.sh/getting-started/installation).
-
-## Overview
-
-AnvilJS provides a simple API to create and manage Anvil instances programmatically.
 
 ## API
 

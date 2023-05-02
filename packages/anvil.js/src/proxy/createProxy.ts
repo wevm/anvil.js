@@ -94,6 +94,7 @@ export async function createProxy({
     ignorePath: true,
     ws: true,
   });
+  proxy.on("error", (error) => console.error(`proxy.on("error")`, error));
 
   const server = createServer(async (req, res) => {
     try {
