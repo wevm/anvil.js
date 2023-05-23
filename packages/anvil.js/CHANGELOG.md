@@ -1,5 +1,11 @@
 # @viem/anvil
 
+## 0.0.6
+
+### Patch Changes
+
+- [`82d8875`](https://github.com/wagmi-dev/anvil.js/commit/82d8875552d559aee1d80e6061bf10ab4a4f84db) Thanks [@fubhy](https://github.com/fubhy)! - Added `shanghai` and `paris` hardforks.
+
 ## 0.0.5
 
 ### Patch Changes
