@@ -73,6 +73,8 @@ type Hardfork =
   | "London"
   | "ArrowGlacier"
   | "GrayGlacier"
+  | "Paris"
+  | "Shanghai"
   | "Latest";
 
 export type AnvilOptions = {
