@@ -3,7 +3,6 @@ import {
   type CreateAnvilOptions,
   createAnvil,
 } from "../anvil/createAnvil.js";
-import getPort from "get-port";
 
 /**
  * A pool of anvil instances.
@@ -96,7 +95,7 @@ export function createPool<TKey = number>({
           ...options,
           ...(options?.port === undefined && autoPort
             ? {
-                port: await getPort(),
+                port:  await ((await import("get-port")).default)(),
               }
             : {}),
         };
