@@ -1,5 +1,13 @@
 # @viem/anvil
 
+## 0.0.7
+
+### Patch Changes
+
+- [#38](https://github.com/wevm/anvil.js/pull/38) [`ad686bd`](https://github.com/wevm/anvil.js/commit/ad686bd82266ff7f11addd6abcd5a4f203457a1a) Thanks [@conwayconstar](https://github.com/conwayconstar)! - As Playwright imports CJS in global setup it will throw the error Error: require() of ES Module changed import to dynamic import.
+  - Removed the import of getPort from `"get-port"`
+  - Updated the port property to use `import("get-port").default` instead of `getPort()`
+
 ## 0.0.6
 
 ### Patch Changes
