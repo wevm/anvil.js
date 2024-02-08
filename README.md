@@ -1,6 +1,6 @@
 # AnvilJS
 
-TypeScript wrapper for Foundry [Anvil](https://github.com/foundry-rs/foundry/tree/master/anvil). AnvilJS provides a simple API to create and manage Anvil instances programmatically.
+TypeScript wrapper for Foundry [Anvil](https://github.com/foundry-rs/foundry/tree/master/crates/anvil). AnvilJS provides a simple API to create and manage Anvil instances programmatically.
 
 ```ts
 import { createAnvil } from "@viem/anvil";
