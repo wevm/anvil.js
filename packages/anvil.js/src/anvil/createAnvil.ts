@@ -106,6 +106,14 @@ export type AnvilOptions = {
    */
   forkChainId?: number | undefined;
   /**
+   * Specify headers to send along with any request to the remote JSON-RPC server in forking mode.
+   * 
+   * e.g. "User-Agent: test-agent"
+   * 
+   * Requires `forkUrl` to be set.
+   */
+  forkHeader?: Record<string, string> | undefined;
+  /**
    * Initial retry backoff on encountering errors.
    */
   forkRetryBackoff?: number | undefined;

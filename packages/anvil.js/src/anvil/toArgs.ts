@@ -7,11 +7,25 @@ import { toFlagCase } from "./toFlagCase.js";
  * @returns The command line arguments.
  */
 export function toArgs(options: {
-  [key: string]: string | boolean | number | bigint | undefined;
+  [key: string]: Record<string, string> | string | boolean | number | bigint | undefined;
 }) {
   return Object.entries(options).flatMap(([key, value]) => {
     if (value === undefined) {
       return [];
+    }
+
+    if(typeof value === "object" && value !== null) {
+      return Object.entries(value).flatMap(([subKey, subValue]) => {
+        if (subValue === undefined) {
+          return [];
+        }
+
+        const flag = toFlagCase(key);
+
+        const value = `${subKey}: ${subValue}`;
+
+        return [flag, value];
+      });
     }
 
     const flag = toFlagCase(key);
