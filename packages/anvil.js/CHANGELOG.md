@@ -1,5 +1,11 @@
 # @viem/anvil
 
+## 0.0.8
+
+### Patch Changes
+
+- [#44](https://github.com/wevm/anvil.js/pull/44) [`5b39862`](https://github.com/wevm/anvil.js/commit/5b398626dd91832840b3bc2178aae40213cb72dc) Thanks [@jnsdls](https://github.com/jnsdls)! - Added support for specifying headers in fork mode
+
 ## 0.0.7
 
 ### Patch Changes
