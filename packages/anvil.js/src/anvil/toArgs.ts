@@ -14,7 +14,7 @@ export function toArgs(options: {
       return [];
     }
 
-    if(typeof value === "object" && value !== null) {
+    if (typeof value === "object" && value !== null) {
       return Object.entries(value).flatMap(([subKey, subValue]) => {
         if (subValue === undefined) {
           return [];
