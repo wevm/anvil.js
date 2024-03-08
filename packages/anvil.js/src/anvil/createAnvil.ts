@@ -437,6 +437,7 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
       const { execa } = await import("execa");
       anvil = execa(anvilBinary, toArgs(anvilOptions), {
         signal: controller.signal,
+        killSignal: 'SIGKILL',
         cleanup: true,
       });
 
