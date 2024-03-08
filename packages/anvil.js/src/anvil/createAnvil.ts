@@ -437,7 +437,6 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
       const { execa } = await import("execa");
       anvil = execa(anvilBinary, toArgs(anvilOptions), {
         signal: controller.signal,
-        killSignal: 'SIGKILL',
         cleanup: true,
       });
 
@@ -460,7 +459,11 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
 
     const timeout = new Promise<void>((_, reject) => {
       setTimeout(() => {
-        reject(new Error("Anvil failed to stop in time"));
+        if (anvil?.kill('SIGKILL')) {
+          reject(new Error("Anvil failed to gracefully stop in time, killed forcefully"));
+        } else {
+          reject(new Error("Anvil failed to gracefully stop in time, but could not kill forcefully"));
+        }
       }, stopTimeout);
     });
 
