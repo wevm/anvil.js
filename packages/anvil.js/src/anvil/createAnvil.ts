@@ -278,6 +278,10 @@ export type AnvilOptions = {
    * Number of blocks with transactions to keep in memory.
    */
   transactionBlockKeeper?: number | undefined;
+  /**
+   * Enable autoImpersonate on startup
+   */
+  autoImpersonate?: boolean | undefined;
 };
 
 export type CreateAnvilOptions = AnvilOptions & {

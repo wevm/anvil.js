@@ -2,7 +2,7 @@
   "editor.defaultFormatter": "rome.rome",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports.rome": true
+    "source.organizeImports.rome": "explicit"
   },
   "[typescript]": {
     "editor.defaultFormatter": "rome.rome"
