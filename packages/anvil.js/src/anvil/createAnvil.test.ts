@@ -1,3 +1,4 @@
+import { parseEther } from "viem";
 import { createAnvilClients } from "../../tests/utils/utils.js";
 import {
   type Anvil,
@@ -106,6 +107,33 @@ test("starts anvil with custom options", async () => {
 
   const id = await publicClient.getChainId();
   expect(id).toBe(123);
+});
+
+test("starts anvil with auto impersonation", async () => {
+  const timestamp = BigInt(new Date("Mon Mar 11 2024").getTime() / 1000);
+  const anvil = createAnvil({
+    port: await getPort({ port: 54321 }),
+    forkUrl: "https://eth.llamarpc.com",
+    autoImpersonate: true,
+    timestamp,
+    chainId: 1337,
+  });
+
+  await anvil.start();
+  const vitalik = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
+  const hayden = "0x50EC05ADe8280758E2077fcBC08D878D4aef79C3";
+  const { walletClient, publicClient } = createAnvilClients(anvil);
+
+  const haydenBalanceBefore = await publicClient.getBalance({address: hayden});
+
+  // Reverts with "No Signer available" if autoImpersonate is false
+  await walletClient.sendTransaction({
+    to: hayden,
+    value: parseEther("10"),
+    account: vitalik,
+  });
+  const haydenBalanceAfter = await publicClient.getBalance({address: hayden});
+  expect(haydenBalanceAfter).toBeGreaterThan(haydenBalanceBefore);
 });
 
 test("can subscribe to stdout", async () => {
