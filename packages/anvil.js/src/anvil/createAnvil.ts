@@ -79,6 +79,10 @@ type Hardfork =
 
 export type AnvilOptions = {
   /**
+   * Enable autoImpersonate on startup
+   */
+  autoImpersonate?: boolean | undefined;
+  /**
    * Sets the number of assumed available compute units per second for this fork provider.
    *
    * @defaultValue 350
@@ -278,10 +282,6 @@ export type AnvilOptions = {
    * Number of blocks with transactions to keep in memory.
    */
   transactionBlockKeeper?: number | undefined;
-  /**
-   * Enable autoImpersonate on startup
-   */
-  autoImpersonate?: boolean | undefined;
 };
 
 export type CreateAnvilOptions = AnvilOptions & {
