@@ -1,5 +1,5 @@
 ---
-"@viem/anvil": minor
+"@viem/anvil": patch
 ---
 
 Added `autoImpersonate` property.

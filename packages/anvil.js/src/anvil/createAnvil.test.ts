@@ -1,4 +1,3 @@
-import { parseEther } from "viem";
 import { createAnvilClients } from "../../tests/utils/utils.js";
 import {
   type Anvil,
@@ -6,6 +5,7 @@ import {
   createAnvil as createAnvilBase,
 } from "./createAnvil.js";
 import getPort from "get-port";
+import { parseEther } from "viem";
 import { afterEach, expect, test, vi } from "vitest";
 
 const instances: Anvil[] = [];
