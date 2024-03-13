@@ -1,5 +1,11 @@
 # @viem/anvil
 
+## 0.0.9
+
+### Patch Changes
+
+- [#47](https://github.com/wevm/anvil.js/pull/47) [`35affef`](https://github.com/wevm/anvil.js/commit/35affef9ea748d18718841fb5f1a79ccaacfad79) Thanks [@banky](https://github.com/banky)! - Added `autoImpersonate` property.
+
 ## 0.0.8
 
 ### Patch Changes
