@@ -79,6 +79,10 @@ type Hardfork =
 
 export type AnvilOptions = {
   /**
+   * Enable autoImpersonate on startup
+   */
+  autoImpersonate?: boolean | undefined;
+  /**
    * Sets the number of assumed available compute units per second for this fork provider.
    *
    * @defaultValue 350
