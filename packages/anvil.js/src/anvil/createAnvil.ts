@@ -1,6 +1,6 @@
 import { stripColors } from "./stripColors.js";
 import { toArgs } from "./toArgs.js";
-import type { ExecaChildProcess } from "execa";
+import type { ExecaChildProcess, Options } from "execa";
 import { EventEmitter } from "node:events";
 import { Writable } from "node:stream";
 
@@ -111,9 +111,9 @@ export type AnvilOptions = {
   forkChainId?: number | undefined;
   /**
    * Specify headers to send along with any request to the remote JSON-RPC server in forking mode.
-   * 
+   *
    * e.g. "User-Agent: test-agent"
-   * 
+   *
    * Requires `forkUrl` to be set.
    */
   forkHeader?: Record<string, string> | undefined;
@@ -284,6 +284,8 @@ export type AnvilOptions = {
   transactionBlockKeeper?: number | undefined;
 };
 
+type ExecaParameters = [string, readonly string[], Options?];
+
 export type CreateAnvilOptions = AnvilOptions & {
   /**
    * Path or alias of the anvil binary.
@@ -291,6 +293,12 @@ export type CreateAnvilOptions = AnvilOptions & {
    * @defaultValue anvil
    */
   anvilBinary?: string;
+  /**
+   * Arguments to pass to the underlying [`exec`](https://github.com/sindresorhus/execa) function.
+   */
+  execArgs?:
+    | ExecaParameters
+    | ((params: ExecaParameters) => ExecaParameters);
   /**
    * Allowed time for anvil to start up in milliseconds.
    *
@@ -326,6 +334,7 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
 
   const {
     anvilBinary = "anvil",
+    execArgs: execArgs_,
     startTimeout = 10_000,
     stopTimeout = 10_000,
     ...anvilOptions
@@ -419,11 +428,8 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
         log = message;
 
         if (status === "starting") {
-          const host = options.host ?? "127.0.0.1";
-          const port = options.port ?? 8545;
-
           // We know that anvil is listening when it prints this message.
-          if (message.includes(`Listening on ${host}:${port}`)) {
+          if (message.includes('Listening on')) {
             setStarted();
           }
         }
@@ -438,11 +444,24 @@ export function createAnvil(options: CreateAnvilOptions = {}): Anvil {
 
       controller = new AbortController();
 
+      const execArgs = (() => {
+        const args: ExecaParameters = [
+          anvilBinary,
+          toArgs(anvilOptions),
+          { signal: controller.signal, cleanup: true },
+        ]
+
+        if (typeof execArgs_ === "undefined") {
+          return args
+        }
+        if (typeof execArgs_ === "function") {
+          return execArgs_(args);
+        }
+        return execArgs_;
+      })()
+
       const { execa } = await import("execa");
-      anvil = execa(anvilBinary, toArgs(anvilOptions), {
-        signal: controller.signal,
-        cleanup: true,
-      });
+      anvil = execa(...execArgs);
 
       anvil.on("closed", () => emitter.emit("closed"));
       anvil.on("exit", (code, signal) => {
