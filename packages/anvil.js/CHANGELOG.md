@@ -1,5 +1,11 @@
 # @viem/anvil
 
+## 0.0.10
+
+### Patch Changes
+
+- [`a0404ab`](https://github.com/wevm/anvil.js/commit/a0404ab4c654d7cbb576d7444e9c24645ca46c02) Thanks [@jxom](https://github.com/jxom)! - Added `execArgs` parameter to `AnvilOptions`.
+
 ## 0.0.9
 
 ### Patch Changes
