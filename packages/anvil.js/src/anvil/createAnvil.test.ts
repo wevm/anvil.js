@@ -159,5 +159,5 @@ test("can subscribe to stderr", async () => {
   await expect(second.start()).rejects.toThrow("Anvil exited");
 
   expect(messages.length).toBeGreaterThanOrEqual(1);
-  expect(messages.join("")).toMatch("thread 'main' panicked");
+  expect(messages.join("")).toContain('Error: Address already in use (os error 48)')
 });
