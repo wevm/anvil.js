@@ -1,3 +1,6 @@
+> [!WARNING]
+> This library is deprecated. We recommend consumers to use [Prool](https://github.com/wevm/prool).
+
 # AnvilJS
 
 TypeScript wrapper for Foundry [Anvil](https://github.com/foundry-rs/foundry/tree/master/crates/anvil). AnvilJS provides a simple API to create and manage Anvil instances programmatically.
